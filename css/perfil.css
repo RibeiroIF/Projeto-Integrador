@@ -1,0 +1,175 @@
+/* Estilos específicos para a Página de Perfil */
+
+.header-perfil {
+    margin-bottom: 30px;
+}
+
+.header-perfil p {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.secao-perfil {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Avatar com botão de editar */
+.perfil-topo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.avatar-edit {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background: var(--theme-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-letra {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.btn-trocar-foto {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.perfil-identidade h3 {
+    color: var(--dark-text);
+}
+
+.perfil-identidade p {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+/* Formulário */
+.form-perfil {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.grid-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.campo label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #444;
+}
+
+.campo input, .campo select, .campo textarea {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+}
+
+.campo input:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.campo textarea {
+    height: 100px;
+    resize: none;
+}
+
+/* Botões */
+.botoes-form {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.btn-cancelar {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-salvar {
+    background: var(--side-bar-color);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-salvar:hover {
+    background: var(--theme-color);
+}
+
+/* Bloco Direito Reputação */
+.card-reputacao {
+    text-align: center;
+    background: #fdfdfd;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+}
+
+.estrelas {
+    font-size: 1.5rem;
+    margin: 10px 0;
+}
+
+.total-avaliacoes {
+    font-size: 0.75rem;
+    color: #999;
+}
+
+.verificacao h4 {
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.lista-verificacao {
+    list-style: none;
+    font-size: 0.85rem;
+}
+
+.lista-verificacao li {
+    margin-bottom: 10px;
+}
+
+.pendente {
+    color: #999;
+}

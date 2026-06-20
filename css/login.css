@@ -1,0 +1,229 @@
+/* login.css */
+
+/* Reset básico para garantir que o layout ocupe a tela toda */
+body.body-login {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--side-bar-color); /* Verde IFSC */
+    min-height: 100vh;
+    /* Forçamos 1 coluna para ignorar o grid de 3 colunas do main.css */
+    grid-template-columns: 1fr !important; 
+}
+
+/* Container que limita a largura da caixa branca */
+.login-container {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+}
+
+/* A caixa branca de login */
+.login-box {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    text-align: center;
+}
+
+.login-logo {
+    width: 80px;
+    margin-bottom: 20px;
+}
+
+.login-header h1 {
+    font-size: 1.6rem;
+    color: var(--dark-text);
+    margin-bottom: 8px;
+}
+
+.login-header p {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+/* Estilo dos campos de entrada */
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #444;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    border-color: var(--theme-color);
+    outline: none;
+}
+
+/* Opções de Lembrar e Esqueci Senha */
+.login-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    margin-bottom: 25px;
+    color: #666;
+}
+
+.login-options a {
+    color: var(--side-bar-color);
+    text-decoration: none;
+}
+
+.login-options a:hover {
+    text-decoration: underline;
+}
+
+/* Botões */
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--theme-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-login:hover {
+    background-color: var(--side-bar-color);
+}
+
+/* Container para os botões ficarem lado a lado */
+.button-group {
+    display: flex;
+    gap: 12px; /* Espaçamento ideal entre os botões */
+    width: 100%;
+}
+
+/* Ajuste sutil no botão para que eles dividam o espaço igualmente */
+.button-group .btn-login {
+    flex: 1;
+    padding: 14px 8px; /* Reduz o padding lateral para evitar quebra de texto em telas menores */
+    font-size: 0.95rem; /* Ajuste leve no tamanho da fonte */
+}
+
+/* Cor padrão (Verde Escuro) para o botão de Admin */
+.btn-login[name="logar-admin"] {
+    background-color: #1b5e20; /* Um tom de verde mais escuro/fechado */
+}
+
+/* Efeito Hover (passar o mouse) para o botão de Admin */
+.btn-login[name="logar-admin"]:hover {
+    background-color: #123e14; /* Um tom ainda mais escuro para o efeito de clique */
+}
+
+/* Divisor "ou" */
+.divisor {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    color: #bbb;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.divisor::before, .divisor::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #eee;
+}
+
+.divisor span {
+    padding: 0 10px;
+}
+
+/* Botão de Cadastro (Outline) */
+.btn-cadastro {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: var(--side-bar-color);
+    border: 2px solid var(--side-bar-color);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-cadastro:hover {
+    background-color: #f0f7ef;
+    color: var(--theme-color);
+    border-color: var(--theme-color);
+}
+
+/* --- MODAL (Pop-up) --- */
+.modal-overlay {
+    display: none; /* Controlado pelo login.js */
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    width: 90%;
+    max-width: 400px;
+    padding: 30px;
+    border-radius: 15px;
+    position: relative;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    animation: surgindo 0.3s ease-out;
+}
+
+@keyframes surgindo {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: var(--side-bar-color);
+    font-size: 1.4rem;
+}
+
+.btn-fechar {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.btn-fechar:hover {
+    color: #333;
+}

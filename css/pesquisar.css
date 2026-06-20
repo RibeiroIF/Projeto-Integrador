@@ -1,0 +1,119 @@
+/* Estilos específicos para a página de Pesquisa */
+
+.header-pesquisa-avancada {
+    margin-bottom: 30px;
+}
+
+.search-box-large {
+    display: flex;
+    gap: 10px;
+    background: white;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.search-box-large input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 10px;
+    font-size: 1.1rem;
+}
+
+.btn-busca-principal {
+    background-color: var(--side-bar-color);
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-busca-principal:hover {
+    background-color: var(--hover-color);
+}
+
+/* Container de Filtros em Linha */
+.filtros-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+.filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filtro-grupo label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--dark-text);
+}
+
+.filtro-grupo select, 
+.filtro-grupo input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.inputs-preco {
+    display: flex;
+    gap: 5px;
+}
+
+.inputs-preco input {
+    width: 50%;
+}
+
+/* Info de Resultados */
+.resultados-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.ordenacao {
+    padding: 5px;
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    color: var(--side-bar-color);
+    cursor: pointer;
+}
+
+/* Histórico no Bloco Direito */
+.historico-pesquisa h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: var(--dark-text);
+}
+
+.historico-pesquisa ul {
+    list-style: none;
+}
+
+.historico-pesquisa li a {
+    color: var(--side-bar-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: block;
+    padding: 5px 0;
+}
+
+.historico-pesquisa li a:hover {
+    text-decoration: underline;
+}

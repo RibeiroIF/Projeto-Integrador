@@ -1,0 +1,279 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+:root {
+  --background-color: #f0f2f5;
+  --theme-color: #51ae47; /* Verde IFSC */
+  --side-bar-color: #2f8325;
+  --hover-color: #72c869;
+  --text-color: #ffffff;
+  --dark-text: #333;
+  --card-bg: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--background-color);
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 300px 1fr 300px; /* Layout fixo de 3 colunas */
+  gap: 15px;
+}
+
+/* --- SIDEBAR (BLOCO ESQUERDO) --- */
+.blocoEsquerdo {
+  background-color: var(--side-bar-color);
+  height: 100vh;
+  padding: 0px;
+  position: sticky;
+  top: 0;
+  color: var(--text-color);
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+  margin-left:-30px;
+}
+
+.blocoEsquerdo .logo {
+  font-weight: 700;
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 40px;
+  text-align: center;
+  border-bottom: 2px solid var(--hover-color);
+  padding-bottom: 10px;
+}
+
+.blocoEsquerdo ul {
+  list-style: none;
+}
+
+.blocoEsquerdo a {
+  text-decoration: none;
+  color: var(--text-color);
+  padding: 12px 15px;
+  display: block;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: 0.3s;
+  font-size: 1rem;
+  cursor: pointer; /* Garante que o usuário veja que é um link */
+}
+
+/* MUDANÇA: Estilo para o link da página atual e hover */
+.blocoEsquerdo a:hover, 
+.blocoEsquerdo a.active {
+  background-color: var(--hover-color);
+  transform: translateX(5px); /* Efeito visual sutil ao passar o mouse */
+}
+
+.admin-link {
+    margin-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 10px;
+}
+
+/* --- CONTEÚDO CENTRAL --- */
+.blocoCentral {
+  padding: 25px;
+  overflow-y: auto;
+}
+
+.header-busca h2 {
+    color: var(--side-bar-color);
+    margin-bottom: 20px;
+}
+
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+.search-bar button {
+    padding: 0 25px;
+    background-color: var(--theme-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.search-bar button:hover {
+    background-color: var(--side-bar-color);
+}
+
+.filtros-rapidos {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.filter-btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid var(--theme-color);
+    background: white;
+    color: var(--side-bar-color);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.filter-btn:hover {
+    background: var(--theme-color);
+    color: white;
+}
+
+/* --- GRID E CARDS --- */
+.grid-anuncios {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.card-anuncio {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    position: relative; /* Para a badge não fugir */
+}
+
+.card-anuncio:hover {
+    transform: translateY(-5px);
+}
+
+.foto-placeholder {
+    height: 150px;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 0.8rem;
+}
+
+.badge-campus {
+    background: var(--theme-color);
+    color: white;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    position: absolute;
+    top: 10px;
+    left: 0;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    z-index: 1;
+}
+
+.info-anuncio {
+    padding: 15px;
+}
+
+.info-anuncio h4 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: var(--dark-text);
+}
+
+.preco {
+    font-weight: 700;
+    color: var(--side-bar-color);
+    font-size: 1.1rem;
+}
+
+.vendedor {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.btn-detalhes {
+    width: 100%;
+    padding: 8px;
+    background-color: transparent;
+    border: 1px solid var(--theme-color);
+    color: var(--theme-color);
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-detalhes:hover {
+    background-color: var(--theme-color);
+    color: white;
+}
+
+/* --- BLOCO DIREITO --- */
+.blocoDireito {
+    background-color: white;
+    padding: 25px;
+    border-left: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.perfil-resumo {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.avatar-grande {
+    font-size: 4rem;
+    margin: 15px 0;
+}
+
+.btn-anunciar {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--theme-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(81, 174, 71, 0.3);
+    transition: 0.3s;
+}
+
+.btn-anunciar:hover {
+    background-color: var(--side-bar-color);
+    transform: scale(1.02);
+}
+
+.feedback-section {
+    margin-top: auto;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+}
+
+.btn-feedback {
+    margin-top: 10px;
+    width: 100%;
+    border: none;
+    background: none;
+    color: var(--side-bar-color);
+    text-decoration: underline;
+    cursor: pointer;
+}

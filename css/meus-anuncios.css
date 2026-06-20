@@ -1,0 +1,138 @@
+/* Estilos específicos para Meus Anúncios */
+
+.header-meus-anuncios {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header-meus-anuncios p {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.btn-anunciar-topo {
+    background-color: var(--side-bar-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* Mini Estatísticas */
+.resumo-anuncios {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.card-mini-stats {
+    background: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.card-mini-stats span {
+    font-size: 0.8rem;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.card-mini-stats strong {
+    font-size: 1.5rem;
+    color: var(--side-bar-color);
+}
+
+/* Lista de Itens */
+.lista-gerenciamento {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.item-anuncio-gerenciar {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+
+.item-anuncio-gerenciar:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.img-preview {
+    width: 80px;
+    height: 80px;
+    background: #eee;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.detalhes-item {
+    flex: 1;
+}
+
+.status-badge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.status-badge.ativo { background: #e8f5e9; color: #2e7d32; }
+.status-badge.vendido { background: #f5f5f5; color: #616161; }
+
+/* Botões de Ação */
+.acoes-item {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-acao {
+    padding: 8px 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-acao.editar:hover { background: #fff3e0; border-color: #ff9800; color: #ff9800; }
+.btn-acao.excluir:hover { background: #ffebee; border-color: #f44336; color: #f44336; }
+.btn-acao.ver:hover { background: #e3f2fd; border-color: #2196f3; color: #2196f3; }
+
+/* Bloco Direito Dicas */
+.dicas-venda h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: var(--dark-text);
+}
+
+.dicas-venda ul {
+    list-style: none;
+}
+
+.dicas-venda li {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    color: #555;
+}

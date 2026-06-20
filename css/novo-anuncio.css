@@ -1,0 +1,124 @@
+/* Header da página */
+.header-pagina {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+/* Container do Formulário */
+.form-anuncio {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.sessao-form {
+    margin-bottom: 30px;
+}
+
+.sessao-form h3 {
+    font-size: 1.1rem;
+    color: #32a041; /* Verde IFSC */
+    margin-bottom: 15px;
+    border-left: 4px solid #32a041;
+    padding-left: 10px;
+}
+
+/* Campos de entrada */
+.campo {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.campo label {
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    color: #444;
+}
+
+.campo input, 
+.campo select, 
+.campo textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.fila-campos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* Upload de fotos customizado */
+.upload-container {
+    position: relative;
+    border: 2px dashed #bbb;
+    padding: 30px;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.upload-container:hover {
+    background-color: #f9f9f9;
+    border-color: #32a041;
+}
+
+.upload-container input[type="file"] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Botões */
+.botoes-form {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.btn-publicar {
+    background-color: #32a041;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-cancelar {
+    background-color: #f4f4f4;
+    color: #666;
+    padding: 12px 25px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-publicar:hover { background-color: #288a35; }
+.btn-cancelar:hover { background-color: #e8e8e8; }
+
+/* Bloco Direito */
+.card-info {
+    background-color: #fff9c4; /* Amarelo clarinho para aviso */
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+.card-info h3 { margin-top: 0; color: #856404; }
+.card-info ul { padding-left: 20px; list-style: none; }
+.card-info li { margin-bottom: 8px; }
