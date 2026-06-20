@@ -1,6 +1,6 @@
 <h1> Projeto Integrador - Classificados IFSC </h1>
 
-<h2> Neste repositório apresentamos o nosso <b>Projeto Integrador</b>, que consiste no sistema de <b>Classificados IFSC</b> </h2>
+<h3> Neste repositório apresentamos o nosso <b>Projeto Integrador</b>, que consiste no sistema de <b>Classificados IFSC</b> </h3>
 <h3> Este sistema é um site de classificados para alunos do IFSC, funcionando como uma aplicação web </h3>
 
 <p> Para este projeto foram utilizadas as tecnologias e linguagens: </p>
