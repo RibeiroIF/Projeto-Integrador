@@ -55,7 +55,6 @@
             id int not null auto_increment,
             nome varchar(40),
             email varchar(60),
-            login varchar(40),
             senha varchar(128),
             data_cadastro date,
             constraint pk_aluno primary key(id)

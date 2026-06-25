@@ -427,9 +427,6 @@
     </aside>
 
     <?php 
-    
-    require_once "executar-banco.php";
-    //require "criar-banco-classificados.php";
 
     ?>
     

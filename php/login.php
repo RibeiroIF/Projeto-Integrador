@@ -18,15 +18,15 @@
                 <p>Acesse com suas credenciais do SIGAA</p>
             </div>
 
-            <form action="index.php" class="login-form">
+            <form action="login.php" class="login-form" method="post">
                 <div class="input-group">
                     <label for="email">E-mail Institucional</label>
-                    <input type="email" id="email" placeholder="exemplo@aluno.ifsc.edu.br" required>
+                    <input type="email" id="email" name="email" placeholder="exemplo@aluno.ifsc.edu.br" required>
                 </div>
 
                 <div class="input-group">
-                    <label for="password">Senha</label>
-                    <input type="password" id="password" placeholder="Sua senha institucional" required>
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" name="senha" placeholder="Sua senha institucional" required>
                 </div>
 
                 <div class="login-options">
@@ -60,7 +60,7 @@
             </div>
             <p class="modal-desc">Para usuários sem e-mail @aluno.ifsc.edu.br</p>
 
-            <form action="login.php" class="login-form">
+            <form action="login.php" class="login-form" method="post">
                 <div class="input-group">
                     <label>Nome:</label>
                     <input type="text" name="nome" placeholder="Seu nome aqui.." required>
@@ -77,7 +77,7 @@
                     <label>Confirme a Senha</label>
                     <input type="password" name="senha2" placeholder="Repita a senha" required>
                 </div>
-                <button type="submit" class="btn-login">Finalizar Cadastro</button>
+                <button type="submit" class="btn-login" name="cadastrar">Finalizar Cadastro</button>
             </form>
         </div>
     </div>
@@ -108,6 +108,14 @@
     if(isset($_POST['logar-admin'])){
         $admins->logar($conexao, $banco->admin);
     }
+
+    if(isset($_POST['cadastrar'])){
+        $alunos->receberDadosForm($conexao);
+        $alunos->cadastrar($conexao, $banco->aluno);
+        $alunos->redirecionarPagina("../php/index.php");
+    }
+
+    $banco->desconectar($conexao);
 
     ?>
 </body>

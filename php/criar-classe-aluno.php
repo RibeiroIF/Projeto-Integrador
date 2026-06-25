@@ -11,12 +11,13 @@
    $this->nome         = trim($conexao->escape_string($_POST["nome"]));
    $this->email        = trim($conexao->escape_string($_POST["email"]));
    // Criptografando a senha em SHA-256 para segurança antes de salvar
-   $this->senha        = hash("sha256", trim($conexao->escape_string($_POST["senha"])));
-   $this->senha2       = hash("sha256", trim($conexao->escape_string($_POST["senha2"])));
+   $this->senha      = trim($conexao->escape_string($_POST["senha"]));
+   $this->senha      = password_hash($this->senha, PASSWORD_ARGON2I);
+/*    $this->senha2       = hash("sha256", trim($conexao->escape_string($_POST["senha2"])));
    
    if($this->senha = $this->senha2){
     $this->senha        = password_hash($this->senha, PASSWORD_ARGON2I);
-   }
+   } */
 
    $this->dataCadastro = date("Y-m-d"); // Capta a data atual do sistema
    }
@@ -34,9 +35,8 @@
    
    function logar($conexao, $tabelaAluno){
 
-   $login = trim($conexao->escape_string($_POST["login"]));
+   $login = trim($conexao->escape_string($_POST["email"]));
    $senha = trim($conexao->escape_string($_POST["senha"]));
-   $senhaCriptografada = password_hash($senha, PASSWORD_ARGON2I);
 
    $sql = "SELECT senha FROM $tabelaAluno WHERE email='$login'";
    $resultado = $conexao->query($sql) or die($conexao->error);
@@ -52,11 +52,32 @@
    if($senhaDoBanco){
     session_start();
     $_SESSION["conectado"] = true;
-    header("../php/tela/index.php");
+    $this->redirecionarPagina("../php/index.php");
    }
    else{
-    echo "<p> Informações de usuário incorretas. </p>";
+    echo "<script>
+            alert('Informações de usuário incorretas. Por favor, tente novamente.');
+            window.location.href = 'login.php';
+        </script>";
    }
+  }
+
+  function redirecionarPagina($endereco){
+    header("location: $endereco");
+  }
+
+  function testarSessao(){
+   session_start();
+   if(!isset($_SESSION) OR !isset($_SESSION["conectado"]) OR $_SESSION["conectado"] != true){
+      die("<p> Você não está logado! <a href='../php/login.php'> Efetuar login </a> </p>");
+    }
+  }
+
+  function logout(){
+    session_start();
+    $_SESSION = [];
+    session_destroy();
+    $this->redirecionarPagina("../php/login.php");
   }
  }
 ?>
