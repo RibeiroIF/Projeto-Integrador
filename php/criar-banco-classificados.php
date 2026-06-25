@@ -74,42 +74,18 @@
     $conexao->query($sql) OR die($conexao->error);
   }
 
-/*   function criarTabelaAluno($conexao){
-    $sql = "CREATE TABLE IF NOT EXISTS $this->aluno (
-           id_usuario int not null auto_increment,
-           constraint pk_aluno primary key(id_usuario),
-           constraint fk_aluno_usuario foreign key(id_usuario) references $this->usuario (id)
-              on delete cascade
-              on update cascade
-              ) ENGINE=innoDB;";
-
-    $conexao->query($sql) OR die($conexao->error);
-  } */
-
-/*   function criarTabelaCategoria($conexao){
-    $sql = "CREATE TABLE IF NOT EXISTS $this->categoria (
-           id int not null auto_increment,
-           nome varchar(20),
-           descricao varchar(60),
-           constraint pk_categoria primary key(id)
-           ) ENGINE=innoDB;";
-
-    $conexao->query($sql) OR die($conexao->error);
-  } */
-
   function criarTabelaAnuncio($conexao){
     $sql = "CREATE TABLE IF NOT EXISTS $this->anuncio (
            id int not null auto_increment,
            titulo varchar(30),
-           descricao varchar(200),
-           preco decimal(10,2) not null,
-           imagem int not null,
            categoria enum ('MÓVEL', 'ELETRODOMÉSTICO', 'MATERIAL', 'UTENSÍLIOS', 'OUTROS', 'ROUPA') default 'MÓVEL',
+           preco decimal(10,2) not null,
+           imagem varchar(255) not null,
+           descricao varchar(200),
            status enum ('EM ABERTO', 'EM NEGOCIACAO', 'VENDIDO') default 'EM ABERTO',
            data_publicacao date,
            data_expiracao date,
            visualizacoes int,
-           denuncias int,
            id_aluno int not null,
            constraint pk_anuncio primary key(id),
            constraint fk_anuncio_aluno foreign key(id_aluno) references $this->aluno(id)

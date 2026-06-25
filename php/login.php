@@ -90,7 +90,7 @@
     require "criar-classe-aluno.php";
     require "criar-classe-admin.php";
 
-    $banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "avaliacao", "denuncia", "feedback");
+    $banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "avaliacao", "denuncia", "feedback");
 
     $conexao = $banco->criarConexao();
     $banco->criarBanco($conexao);

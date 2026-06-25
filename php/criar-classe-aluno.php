@@ -4,6 +4,9 @@
   public $email;
   public $senha;
   public $senha2;
+  public $campus;
+  public $whatsapp;
+  public $bio;
   public $dataCadastro;
  
   function receberDadosForm($conexao){
@@ -35,31 +38,107 @@
    
    function logar($conexao, $tabelaAluno){
 
-   $login = trim($conexao->escape_string($_POST["email"]));
-   $senha = trim($conexao->escape_string($_POST["senha"]));
+    $login = trim($conexao->escape_string($_POST["email"]));
+    $senha = trim($conexao->escape_string($_POST["senha"]));
 
-   $sql = "SELECT senha FROM $tabelaAluno WHERE email='$login'";
-   $resultado = $conexao->query($sql) or die($conexao->error);
+    // ALTERAÇÃO: Adicionado 'id' e 'email' no SELECT além da senha
+    // Nota: Ajuste o nome da coluna 'id' caso no seu banco seja 'id_aluno' ou similar
+    $sql = "SELECT id, email, senha FROM $tabelaAluno WHERE email='$login'";
+    $resultado = $conexao->query($sql) or die($conexao->error);
 
-   $senhaDoBanco = false;
+    $senhaDoBanco = false;
+    $dadosUsuario = null; // Variável para guardar os dados temporariamente
 
-   if($conexao->affected_rows != 0){
-    $vetorRegistro = $resultado->fetch_array();
-    $senhaCriptografada = $vetorRegistro[0];
-    $senhaDoBanco = password_verify($senha, $senhaCriptografada);
-   }
+    if($conexao->affected_rows != 0){
+      $vetorRegistro = $resultado->fetch_array();
+      
+      // Armazenamos o registro completo para usar caso a senha esteja correta
+      $dadosUsuario = $vetorRegistro; 
+      
+      // Como mudamos o SELECT, a senha agora está no índice [2] (id=0, email=1, senha=2)
+      $senhaCriptografada = $vetorRegistro[2];
+      $senhaDoBanco = password_verify($senha, $senhaCriptografada);
+    }
 
-   if($senhaDoBanco){
-    session_start();
-    $_SESSION["conectado"] = true;
-    $this->redirecionarPagina("../php/index.php");
-   }
-   else{
-    echo "<script>
-            alert('Informações de usuário incorretas. Por favor, tente novamente.');
-            window.location.href = 'login.php';
-        </script>";
-   }
+    if($senhaDoBanco){
+      // Se a sessão já não tiver sido iniciada em outro lugar, inicia aqui
+      if (session_status() === PHP_SESSION_NONE) {
+          session_start();
+      }
+      
+      $_SESSION["conectado"] = true;
+      
+      // PASSO 2 INCLUÍDO AQUI: Guardando os dados reais do usuário logado na sessão
+      $_SESSION["id_aluno"]    = $dadosUsuario['id'];    // ou $dadosUsuario[0]
+      $_SESSION["email_aluno"] = $dadosUsuario['email']; // ou $dadosUsuario[1]
+
+      $this->redirecionarPagina("../php/index.php");
+    }
+    else{
+      echo "<script>
+              alert('Informações de usuário incorretas. Por favor, tente novamente.');
+              window.location.href = 'login.php';
+          </script>";
+    }
+  }
+
+  function carregarDadosPerfil($conexao, $tabelaAluno) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    $id_usuario = $_SESSION["id_aluno"] ?? 0;
+
+    $sql = "SELECT * FROM $tabelaAluno WHERE id = '$id_usuario'";
+    $resultado = $conexao->query($sql) or die($conexao->error);
+    
+    if ($resultado->num_rows > 0) {
+        $dados = $resultado->fetch_assoc();
+        
+        $this->nome     = htmlentities($dados['nome'] ?? '', ENT_QUOTES, "UTF-8");
+        $this->email    = htmlentities($dados['email'] ?? '', ENT_QUOTES, "UTF-8");
+        $this->campus   = $dados['campus'] ?? ''; 
+        $this->whatsapp = htmlentities($dados['whatsapp'] ?? '', ENT_QUOTES, "UTF-8");
+        $this->bio      = htmlentities($dados['bio'] ?? '', ENT_QUOTES, "UTF-8");
+        
+        // TRATAMENTO DA DATA INCLUÍDO AQUI:
+        // Pega a data do banco (Ex: 2024-03-15) e formata para o padrão brasileiro (15/03/2024)
+        if (!empty($dados['data_cadastro'])) { // Ajuste 'data_cadastro' para o nome exato da coluna no seu banco
+            $data = new DateTime($dados['data_cadastro']);
+            $this->dataCadastro = $data->format('d/m/Y');
+        } else {
+            $this->dataCadastro = "N/A";
+        }
+    }
+  }
+
+  function atualizarPerfil($conexao, $tabelaAluno){
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    // Só permite atualizar se houver uma sessão válida de ID
+    if(isset($_SESSION["id_aluno"])){
+      $id_usuario = $_SESSION["id_aluno"];
+      
+      $this->nome   = trim($conexao->escape_string($_POST["nome"]));
+      $this->campus = trim($conexao->escape_string($_POST["campus"]));
+
+      // Atualiza apenas as colunas existentes, ignorando whatsapp e bio (sem quebrar o banco)
+      $sql = "UPDATE $tabelaAluno SET nome = '$this->nome', campus = '$this->campus' WHERE id = '$id_usuario'";
+      
+      if($conexao->query($sql)){
+         echo "<script>
+                alert('Perfil atualizado com sucesso!');
+                window.location.href = 'index.php';
+              </script>";
+      } else {
+         echo "<script>
+                alert('Erro ao atualizar: " . $conexao->error . "');
+                window.location.href = 'index.php';
+              </script>";
+      }
+    }
   }
 
   function redirecionarPagina($endereco){

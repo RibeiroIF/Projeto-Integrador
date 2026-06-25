@@ -277,3 +277,18 @@ body {
     text-decoration: underline;
     cursor: pointer;
 }
+
+.tela.collapse {
+    display: none !important;
+}
+
+/* Garante que a tela ativa apareça com o seu bloco padrão */
+.tela.show {
+    display: block !important; /* Ou 'flex' / 'grid', dependendo de como estruturou suas telas */
+}
+
+/* Caso a tela home precise de um comportamento específico (ex: grid/flex) */
+.tela-home.show {
+    display: flex !important; 
+    flex-direction: column;
+}

@@ -1,3 +1,37 @@
+<?php
+// Inclui os arquivos necessários
+require_once "criar-banco-classificados.php";
+require_once "criar-classe-anuncio.php";
+require_once "criar-classe-aluno.php";
+require_once "criar-classe-avaliacao.php";
+require_once "criar-classe-denuncia.php";
+require_once "criar-classe-feedback.php";
+
+// Cria a conexão (isso fica invisível para o navegador, não altera o visual)
+$banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "avaliacao", "denuncia", "feedback");
+$conexao = $banco->criarConexao();
+$banco->abrirBanco($conexao);
+$banco->definirCharset($conexao);
+
+$anuncios = new Anuncios();
+$alunos = new Alunos();
+
+// Certifica-se de que a sessão está ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["nome"])) {
+      $alunos->atualizarPerfil($conexao, $banco->aluno);
+  }
+
+// Se o usuário não estiver logado, redireciona para a tela de login por segurança
+if (!isset($_SESSION['id_aluno'])) {
+    header("Location: login.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -53,27 +87,10 @@
         </section>
 
             <div class="grid-anuncios">
-                <article class="card-anuncio">
-                    <div class="badge-campus">Câmpus Florianópolis</div>
-                    <div class="foto-placeholder">Imagem do Produto</div>
-                    <div class="info-anuncio">
-                        <h4>Cálculo A - Diva Flemming</h4>
-                        <p class="preco">R$ 45,00</p>
-                        <p class="vendedor">Vendido por: Maria Silva</p>
-                        <button class="btn-detalhes">Ver Detalhes</button>
-                    </div>
-                </article>
-                
-                <article class="card-anuncio">
-                    <div class="badge-campus">Câmpus São José</div>
-                    <div class="foto-placeholder">Imagem do Produto</div>
-                    <div class="info-anuncio">
-                        <h4>Monitor 24' Dell</h4>
-                        <p class="preco">R$ 600,00</p>
-                        <p class="vendedor">Vendido por: João Pedro</p>
-                        <button class="btn-detalhes">Ver Detalhes</button>
-                    </div>
-                </article>
+                <?php 
+                    // Chama o método diretamente onde os cards devem aparecer
+                    $anuncios->listarAnunciosAtivos($conexao, $banco->anuncio); 
+                ?>
             </div>
         </div>
 
@@ -127,15 +144,10 @@
             </div>
 
             <div class="grid-anuncios">
-                <article class="card-anuncio">
-                    <div class="badge-campus">Câmpus Florianópolis</div>
-                    <div class="foto-placeholder">Imagem</div>
-                    <div class="info-anuncio">
-                        <h4>Monitor 24' Dell</h4>
-                        <p class="preco">R$ 600,00</p>
-                        <button class="btn-detalhes">Ver Detalhes</button>
-                    </div>
-                </article>
+                <?php 
+                    // Renderiza dinamicamente os mesmos cards ativos usando sua função existente
+                    $anuncios->listarAnunciosAtivos($conexao, $banco->anuncio); 
+                ?>
             </div>
         </div>
 
@@ -152,46 +164,33 @@
             </header>
 
             <section class="resumo-anuncios">
+                <?php
+                    // Define o ID do usuário logado (exemplo)
+                    $id_usuario_logado = 1; 
+
+                    // Executa a função do arquivo externo e recebe os dados
+                    $stats = $anuncios->obterContadoresUsuario($conexao, $banco->anuncio, $id_usuario_logado);
+                ?>
+
                 <div class="card-mini-stats">
                     <span>Ativos</span>
-                    <strong>03</strong>
+                    <strong><?php echo $stats['ativos']; ?></strong>
                 </div>
                 <div class="card-mini-stats">
                     <span>Vendidos</span>
-                    <strong>12</strong>
+                    <strong><?php echo $stats['vendidos']; ?></strong>
                 </div>
                 <div class="card-mini-stats">
                     <span>Visualizações</span>
-                    <strong>142</strong>
+                    <strong><?php echo $stats['visualizacoes']; ?></strong>
                 </div>
             </section>
 
             <div class="lista-gerenciamento">
-                <article class="item-anuncio-gerenciar">
-                    <div class="img-preview">📸</div>
-                    <div class="detalhes-item">
-                        <h4>Cálculo A - Diva Flemming</h4>
-                        <p class="preco">R$ 45,00</p>
-                        <span class="status-badge ativo">Ativo</span>
-                    </div>
-                    <div class="acoes-item">
-                        <button class="btn-acao editar">Editar</button>
-                        <button class="btn-acao excluir">Excluir</button>
-                    </div>
-                </article>
-
-                <article class="item-anuncio-gerenciar">
-                    <div class="img-preview">📸</div>
-                    <div class="detalhes-item">
-                        <h4>Monitor 24' Dell</h4>
-                        <p class="preco">R$ 600,00</p>
-                        <span class="status-badge vendido">Vendido</span>
-                    </div>
-                    <div class="acoes-item">
-                        <button class="btn-acao ver">Ver Comprador</button>
-                        <button class="btn-acao excluir">Remover</button>
-                    </div>
-                </article>
+                <?php 
+                    $id_usuario_logado = $_SESSION['id_aluno']; 
+                    $anuncios->listarMeusAnuncios($conexao, $banco->anuncio, $id_usuario_logado); 
+                ?>
             </div>
         </div>
 
@@ -203,18 +202,19 @@
                 <p>Preencha os detalhes abaixo para publicar seu item.</p>
             </header>
 
-            <form class="form-anuncio">
+            <form class="form-anuncio" method="post" action="index.php" enctype="multipart/form-data">
+                <input type="hidden" name="id_vendedor" value="1">
                 <section class="sessao-form">
                     <h3>Informações Básicas</h3>
                     <div class="campo">
                         <label for="titulo">Título do Anúncio *</label>
-                        <input type="text" id="titulo" placeholder="Ex: Livro Cálculo A - Diva Flemming" required>
+                        <input type="text" id="titulo" name="titulo-anuncio" placeholder="Ex: Livro Cálculo A - Diva Flemming" required>
                     </div>
 
                     <div class="fila-campos">
                         <div class="campo">
                             <label for="categoria">Categoria</label>
-                            <select id="categoria">
+                            <select id="categoria" name="categoria-anuncio">
                                 <option value="livros">Livros / Material Didático</option>
                                 <option value="eletronicos">Eletrônicos</option>
                                 <option value="moveis">Móveis</option>
@@ -223,7 +223,7 @@
                         </div>
                         <div class="campo">
                             <label for="preco">Preço (R$)*</label>
-                            <input type="number" id="preco" step="0.01" placeholder="0,00" required>
+                            <input type="number" id="preco" name="preco-anuncio" step="0.01" placeholder="0,00" required>
                         </div>
                     </div>
                 </section>
@@ -233,21 +233,25 @@
                     <div class="campo">
                         <label>Fotos do Produto</label>
                         <div class="upload-container">
-                            <input type="file" id="fotos" multiple accept="image/*">
+                            <input type="file" id="fotos" name="foto-anuncio" accept="image/*" onchange="mostrarConfirmacao(this)">
+                            
                             <div class="upload-placeholder">
-                                <span>📷 Clique para selecionar fotos</span>
+                                <span id="texto-upload">📷 Clique para selecionar fotos</span>
+                                
+                                <br>
+                                <img id="preview-imagem" src="" alt="Prévia" style="display: none; max-width: 120px; max-height: 120px; margin-top: 10px; border-radius: 4px;">
                             </div>
                         </div>
                     </div>
                     <div class="campo">
                         <label for="descricao">Descrição Detalhada</label>
-                        <textarea id="descricao" rows="5" placeholder="Descreva o estado do item, tempo de uso, etc."></textarea>
+                        <textarea id="descricao" rows="5" name="descricao-anuncio" placeholder="Descreva o estado do item, tempo de uso, etc."></textarea>
                     </div>
                 </section>
 
                 <div class="botoes-form">
                     <button type="button" class="btn-cancelar" onclick="history.back()">Cancelar</button>
-                    <button type="submit" class="btn-publicar">Publicar Anúncio</button>
+                    <button type="submit" name="publicar-anuncio" class="btn-publicar">Publicar Anúncio</button>
                 </div>
             </form>
         </div>
@@ -294,53 +298,65 @@
                 <p>Gerencie suas informações públicas e de segurança.</p>
             </header>
 
+            <?php
+                    // Apenas manda o objeto carregar as informações do banco para dentro dele
+                    $alunos->carregarDadosPerfil($conexao, $banco->aluno);
+                    ?>
+
             <section class="secao-perfil">
                 <div class="perfil-topo">
                     <div class="avatar-edit">
-                        <span class="avatar-letra">A</span>
+                        <span class="avatar-letra">
+                            <?php echo !empty($alunos->nome) ? mb_strtoupper(mb_substr($alunos->nome, 0, 1, "UTF-8"), "UTF-8") : "A"; ?>
+                        </span>
                         <button class="btn-trocar-foto">📷</button>
                     </div>
                     <div class="perfil-identidade">
-                        <h3>Aluno Exemplo</h3>
-                        <p>Membro desde: Março 2024</p>
+                        <h3><?php echo $alunos->nome; ?></h3>
+                        <p>Membro desde: <?php echo $alunos->dataCadastro; ?></p>
                     </div>
                 </div>
 
-                <form class="form-perfil">
-                    <div class="grid-form">
-                        <div class="campo">
-                            <label>Nome Completo</label>
-                            <input type="text" value="Aluno Exemplo de Souza">
-                        </div>
-                        <div class="campo">
-                            <label>E-mail Institucional</label>
-                            <input type="email" value="aluno.souza@aluno.ifsc.edu.br" disabled>
-                        </div>
-                        <div class="campo">
-                            <label>Câmpus Principal</label>
-                            <select>
-                                <option>Florianópolis</option>
-                                <option>São José</option>
-                                <option>Palhoça</option>
-                                <option>Garopaba</option>
-                            </select>
-                        </div>
-                        <div class="campo">
-                            <label>WhatsApp (Para contato)</label>
-                            <input type="text" placeholder="(48) 99999-9999">
-                        </div>
-                    </div>
 
-                    <div class="campo">
-                        <label>Bio / Descrição</label>
-                        <textarea placeholder="Conte um pouco sobre você ou o que costuma vender/comprar..."></textarea>
-                    </div>
 
-                    <div class="botoes-form">
-                        <button type="button" class="btn-cancelar">Descartar Alterações</button>
-                        <button type="submit" class="btn-salvar">Salvar Alterações</button>
-                    </div>
-                </form>
+                    <form class="form-perfil" method="POST" action="">
+                        <div class="grid-form">
+                            <div class="campo">
+                                <label for="perfil-nome">Nome Completo</label>
+                                <input type="text" id="perfil-nome" name="nome" value="<?php echo $alunos->nome; ?>" required>
+                            </div>
+                            
+                            <div class="campo">
+                                <label>E-mail Institucional</label>
+                                <input type="email" value="<?php echo $alunos->email; ?>" disabled>
+                            </div>
+                            
+                            <div class="campo">
+                                <label for="perfil-campus">Câmpus Principal</label>
+                                <select id="perfil-campus" name="campus">
+                                    <option value="Florianópolis" <?php echo ($alunos->campus == 'Florianópolis') ? 'selected' : ''; ?>>Florianópolis</option>
+                                    <option value="São José" <?php echo ($alunos->campus == 'São José') ? 'selected' : ''; ?>>São José</option>
+                                    <option value="Palhoça" <?php echo ($alunos->campus == 'Palhoça') ? 'selected' : ''; ?>>Palhoça</option>
+                                    <option value="Garopaba" <?php echo ($alunos->campus == 'Garopaba') ? 'selected' : ''; ?>>Garopaba</option>
+                                </select>
+                            </div>
+                            
+                            <div class="campo">
+                                <label for="perfil-whats">WhatsApp (Para contato)</label>
+                                <input type="text" id="perfil-whats" name="whatsapp" placeholder="(48) 99999-9999" value="<?php echo $alunos->whatsapp; ?>">
+                            </div>
+                        </div>
+
+                        <div class="campo">
+                            <label for="perfil-bio">Bio / Descrição</label>
+                            <textarea id="perfil-bio" name="bio" placeholder="Conte um pouco sobre você ou o que costuma vender/comprar..."><?php echo $alunos->bio; ?></textarea>
+                        </div>
+
+                        <div class="botoes-form">
+                            <button type="button" class="btn-cancelar" onclick="window.location.reload()">Descartar Alterações</button>
+                            <button type="submit" class="btn-salvar">Salvar Alterações</button>
+                        </div>
+                    </form>
             </section>
         </div>
         
@@ -411,7 +427,7 @@
         <div class="perfil-resumo">
             <h3>Meu Perfil</h3>
             <div class="avatar-grande">👤</div>
-            <p><strong>Estudante:</strong> @aluno.ifsc.edu.br</p>
+            <p><strong>Estudante:</strong> <?php echo $_SESSION['email_aluno']; ?></p>
             <p class="avaliacao">Média: ⭐ 4.8</p>
         </div>
 
@@ -425,10 +441,21 @@
             <button class="btn-feedback">Enviar Feedback</button>
         </div>
     </aside>
-
-    <?php 
-
-    ?>
     
+    <?php
+    // Processa o cadastro apenas se o botão do formulário foi clicado
+    if(isset($_POST['publicar-anuncio'])){
+        $anuncios->receberDadosForm($conexao);
+        $anuncios->cadastrar($conexao, $banco->anuncio);
+        
+        // REDIRECIONAMENTO CRÍTICO: Limpa os dados do POST e recarrega a página index limpa
+        header("Location: index.php?cadastro=sucesso");
+        exit();
+    }
+
+    // Fecha a conexão com segurança no fim de tudo
+    $banco->desconectar($conexao);
+    ?>
+
 </body>
 </html>
