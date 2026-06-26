@@ -10,11 +10,12 @@
   public $aluno;
 
   public $anuncio;
+  public $favorito; 
   public $avaliacao;
   public $denuncia;
   public $feedback;
 
-  function __construct($servidor, $user, $senha, $dbIntegrador, $admin, $aluno, $anuncio, $avaliacao, $denuncia, $feedback)
+  function __construct($servidor, $user, $senha, $dbIntegrador, $admin, $aluno, $anuncio, $favorito, $avaliacao, $denuncia, $feedback)
    {
    $this->servidor = $servidor;
    $this->user = $user;
@@ -26,6 +27,7 @@
    $this->aluno = $aluno;
 
    $this->anuncio = $anuncio;
+   $this->favorito = $favorito; 
    $this->avaliacao = $avaliacao;
    $this->denuncia = $denuncia;
    $this->feedback = $feedback;
@@ -66,19 +68,19 @@
   function criarTabelaAdmin($conexao){
     $sql = "CREATE TABLE IF NOT EXISTS $this->admin (
             id int not null auto_increment,
-            login int not null,
-            senha varchar(20) not null,
+            login varchar(100) not null,
+            senha varchar(255) not null,
             constraint pk_administrador primary key(id)
             ) ENGINE=innoDB;";
 
     $conexao->query($sql) OR die($conexao->error);
-  }
+}
 
   function criarTabelaAnuncio($conexao){
     $sql = "CREATE TABLE IF NOT EXISTS $this->anuncio (
            id int not null auto_increment,
            titulo varchar(30),
-           categoria enum ('MÓVEL', 'ELETRODOMÉSTICO', 'MATERIAL', 'UTENSÍLIOS', 'OUTROS', 'ROUPA') default 'MÓVEL',
+           categoria enum ('LIVROS', 'ELETRÔNICOS', 'MÓVEIS', 'OUTROS') default 'ELETRÔNICOS',
            preco decimal(10,2) not null,
            imagem varchar(255) not null,
            descricao varchar(200),
@@ -88,8 +90,22 @@
            visualizacoes int,
            id_aluno int not null,
            constraint pk_anuncio primary key(id),
-           constraint fk_anuncio_aluno foreign key(id_aluno) references $this->aluno(id)
+           /* ALTERADO: Se o aluno for excluído, todos os seus anúncios somem em cascata */
+           constraint fk_anuncio_aluno foreign key(id_aluno) references $this->aluno(id) on delete cascade
     ) ENGINE=innoDB;";
+
+    $conexao->query($sql) OR die($conexao->error);
+  }
+
+  function criarTabelaFavorito($conexao){
+    $sql = "CREATE TABLE IF NOT EXISTS $this->favorito (
+           id_aluno int not null,
+           id_anuncio int not null,
+           data_favoritado datetime default current_timestamp,
+           constraint pk_favoritos primary key(id_aluno, id_anuncio),
+           constraint fk_fav_aluno foreign key(id_aluno) references $this->aluno(id) on delete cascade,
+           constraint fk_fav_anuncio foreign key(id_anuncio) references $this->anuncio(id) on delete cascade
+           ) ENGINE=innoDB;";
 
     $conexao->query($sql) OR die($conexao->error);
   }
@@ -104,8 +120,9 @@
            id_anuncio int not null,
            id_comprador int not null,
            constraint pk_avaliacao primary key(id),
-           constraint fk_avaliacao_anuncio foreign key(id_anuncio) references $this->anuncio(id),
-           constraint fk_avaliacao_aluno foreign key(id_comprador) references $this->aluno(id)
+           /* ALTERADO: On delete cascade adicionado para evitar travas */
+           constraint fk_avaliacao_anuncio foreign key(id_anuncio) references $this->anuncio(id) on delete cascade,
+           constraint fk_avaliacao_aluno foreign key(id_comprador) references $this->aluno(id) on delete cascade
             ) ENGINE=innoDB;";
 
     $conexao->query($sql) OR die($conexao->error);
@@ -119,8 +136,9 @@
            id_anuncio int not null,
            id_comprador int not null,
            constraint pk_denuncia primary key(id),
-           constraint fk_denuncia_anuncio foreign key(id_anuncio) references anuncio(id),
-           constraint fk_denuncia_aluno foreign key(id_comprador) references aluno(id)
+           /* ALTERADO: On delete cascade adicionado para evitar travas */
+           constraint fk_denuncia_anuncio foreign key(id_anuncio) references $this->anuncio(id) on delete cascade,
+           constraint fk_denuncia_aluno foreign key(id_comprador) references $this->aluno(id) on delete cascade
            ) ENGINE=innoDB;";
 
     $conexao->query($sql) OR die($conexao->error);
@@ -133,7 +151,8 @@
            data_feedback date,
            id_usuario int not null,
            constraint pk_feedback primary key(id),
-           constraint fk_feedback_aluno foreign key(id_usuario) references aluno(id)
+           /* ALTERADO: On delete cascade adicionado para evitar travas */
+           constraint fk_feedback_aluno foreign key(id_usuario) references $this->aluno(id) on delete cascade
            ) ENGINE=innoDB;";
 
     $conexao->query($sql) OR die($conexao->error);
@@ -161,3 +180,4 @@
     $conexao->close();
   }
 }
+?>

@@ -7,29 +7,68 @@ require_once "criar-classe-avaliacao.php";
 require_once "criar-classe-denuncia.php";
 require_once "criar-classe-feedback.php";
 
-// Cria a conexão (isso fica invisível para o navegador, não altera o visual)
-$banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "avaliacao", "denuncia", "feedback");
-$conexao = $banco->criarConexao();
-$banco->abrirBanco($conexao);
-$banco->definirCharset($conexao);
-
-$anuncios = new Anuncios();
-$alunos = new Alunos();
-
 // Certifica-se de que a sessão está ativa
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["nome"])) {
-      $alunos->atualizarPerfil($conexao, $banco->aluno);
-  }
-
 // Se o usuário não estiver logado, redireciona para a tela de login por segurança
 if (!isset($_SESSION['id_aluno'])) {
     header("Location: login.php");
     exit();
 }
+// Cria a conexão (isso fica invisível para o navegador, não altera o visual)
+$banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
+$conexao = $banco->criarConexao();
+$banco->abrirBanco($conexao);
+$banco->definirCharset($conexao);
+$banco->criarTabelaAnuncio($conexao);
+$banco->criarTabelaFavorito($conexao);
+
+$anuncios = new Anuncios();
+$alunos = new Alunos();
+
+
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["nome"])) {
+      $alunos->atualizarPerfil($conexao, $banco->aluno);
+      // Recarrega os dados atualizados caso o formulário tenha sido enviado
+      $alunos->carregarDadosPerfil($conexao, $banco->aluno, $_SESSION['id_aluno']);
+}
+
+if (isset($_POST['deletar_id_anuncio'])) {
+    $id_del = intval($_POST['deletar_id_anuncio']);
+    $id_user = intval($_SESSION['id_aluno']); // Segurança: garante que o aluno só delete o que é dele
+    
+    $conexao->query("DELETE FROM " . $banco->anuncio . " WHERE id = $id_del AND id_aluno = $id_user") or die($conexao->error);
+    
+    header("Location: index.php?status=excluido");
+    exit();
+}
+
+// TRATAMENTO 2: AÇÃO DE PUBLICAR OU ATUALIZAR ANÚNCIO
+if (isset($_POST['publicar-anuncio'])) {
+    $anuncios->receberDadosForm($conexao);
+    
+    // Se o input de ID de edição estiver preenchido, faremos um UPDATE
+    if (!empty($_POST['id_anuncio'])) {
+        $id_editar = intval($_POST['id_anuncio']);
+        
+        // Crie o método correspondente ou faça a lógica do UPDATE aqui
+        $anuncios->atualizar($conexao, $banco->anuncio, $id_editar);
+        $mensagem_redirecionar = "atualizado";
+    } else {
+        // Caso contrário, segue o fluxo normal do seu INSERT antigo
+        $anuncios->cadastrar($conexao, $banco->anuncio);
+        $mensagem_redirecionar = "sucesso";
+    }
+    
+    $banco->desconectar($conexao);
+    header("Location: index.php?cadastro=" . $mensagem_redirecionar);
+    exit();
+}
+
+// CARREGA OS DADOS DO PERFIL AQUI NO TOPO (Garante prioridade na conexão)
+$alunos->carregarDadosPerfil($conexao, $banco->aluno, $_SESSION['id_aluno']);
+
 ?>
 
 <!DOCTYPE html>
@@ -49,6 +88,9 @@ if (!isset($_SESSION['id_aluno'])) {
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/login.css">
     <script src="../javascript/troca-de-tela.js"></script>
+    <script src="../javascript/favoritos.js"></script>
+    <script src="../javascript/gerenciar-anuncios.js"></script>
+    <script src="../javascript/ver-detalhes.js"></script>
     <title>Classificados IFSC - Home</title>
 </head>
 <body>
@@ -62,94 +104,122 @@ if (!isset($_SESSION['id_aluno'])) {
                 <li><a href="#" id="menu-anuncio" class="menu" onclick="navegar('tela-meusanuncios'); navegarMenu('menu-anuncio')">Meus Anúncios</a></li>
                 <li><a href="#" id="menu-favoritos" class="menu" onclick="navegar('tela-favoritos'); navegarMenu('menu-favoritos')">Favoritos</a></li>
                 <li><a href="#" id="menu-perfil" class="menu" onclick="navegar('tela-perfil'); navegarMenu('menu-perfil')">Perfil</a></li>
-                <li class="admin-link"><a href="#" id="menu-adm" class="menu" onclick="navegar('tela-admin'); navegarMenu('menu-adm')">Painel Adm</a></li>
                 <li><a href="login.php" class="logout">Sair</a></li>
             </ul>
         </nav>
     </aside>
 
+    <div id="modal-detalhes" class="modal-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center;">
+        <div class="modal-conteudo" style="background: #fff; padding: 25px; border-radius: 8px; max-width: 500px; width: 90%; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+            
+            <span class="btn-fechar-modal" onclick="fecharModalDetalhes()" style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #777;">&times;</span>
+            
+            <div id="modal-carregando" style="text-align: center; padding: 20px;">
+                <p>Carregando detalhes...</p>
+            </div>
+
+            <div id="modal-dados-produto" style="display: none;">
+              <h3 id="detalhe-titulo" style="margin-top: 0; color: #333;">Título do Produto</h3>
+              <span id="detalhe-categoria" class="badge-campus" style="position: static; display: inline-block; margin-bottom: 15px;">Categoria</span>
+              
+              <p id="detalhe-status" style="font-weight: bold; margin: 5px 0 15px 0; font-size: 14px;"></p>
+              
+              <div style="height: 250px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 4px; overflow: hidden; margin-bottom: 15px;">
+                  <img id="detalhe-imagem" src="" alt="Produto" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+              </div>
+              
+              <p class="preco" style="font-size: 20px; color: #28a745; font-weight: bold; margin: 10px 0;">R$ 0,00</p>
+              
+              <div style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;">
+                  <h5>Descrição:</h5>
+                  <p id="detalhe-descricao" style="color: #666; font-size: 14px; line-height: 1.5; max-height: 100px; overflow-y: auto;">Descrição detalhada aqui.</p>
+              </div>
+          </div>
+        </div>
+    </div>
+
     <main class="blocoCentral">
     <!--Tela inicial-->
         <div id="tela-home" class="main tela-home tela show">
-            <header class="header-busca">
-            <h2>Explorar Anúncios</h2>
-            <div class="search-bar">
-                <input type="text" placeholder="O que você procura hoje? (Livros, eletrônicos...)">
-                <button>Buscar</button>
-            </div>
-        </header>
+          <header class="header-busca">
+              <h2>Explorar Anúncios</h2>
+              <div class="search-bar">
+                  <input type="text" placeholder="O que você procura hoje? (Livros, eletrônicos...)">
+                  <button>Buscar</button>
+              </div>
+          </header>
 
-        <section class="filtros-rapidos">
-            <button class="filter-btn">Livros</button>
-            <button class="filter-btn">Eletrônicos</button>
-            <button class="filter-btn">Móveis</button>
-            <button class="filter-btn">Serviços</button>
-        </section>
+          <section class="filtros-rapidos">
+              <button class="filter-btn">Livros</button>
+              <button class="filter-btn">Eletrônicos</button>
+              <button class="filter-btn">Móveis</button>
+              <button class="filter-btn">Serviços</button>
+          </section>
 
-            <div class="grid-anuncios">
-                <?php 
-                    // Chama o método diretamente onde os cards devem aparecer
-                    $anuncios->listarAnunciosAtivos($conexao, $banco->anuncio); 
-                ?>
-            </div>
-        </div>
+          <div class="grid-anuncios">
+              <?php 
+                  // Atualizado: Passando o ID do aluno logado para a checagem dos corações
+                  $anuncios->listarAnunciosAtivos($conexao, $banco->anuncio, $_SESSION['id_aluno']); 
+              ?>
+          </div>
+      </div>
 
         <!--Tela de pesquisa-->
         <div id="tela-pesquisa" class="tela collapse">
-            <header class="header-pesquisa-avancada">
-            <h2>Busca Detalhada</h2>
-            <div class="search-box-large">
-                <input type="text" placeholder="Ex: Monitor Dell 24 polegadas...">
-                <button class="btn-busca-principal">Pesquisar</button>
-            </div>
-        </header>
+          <header class="header-pesquisa-avancada">
+              <h2>Busca Detalhada</h2>
+              <div class="search-box-large">
+                  <input type="text" placeholder="Ex: Monitor Dell 24 polegadas...">
+                  <button class="btn-busca-principal">Pesquisar</button>
+              </div>
+          </header>
 
-        <section class="filtros-container">
-            <div class="filtro-grupo">
-                <label>Câmpus:</label>
-                <select>
-                    <option value="todos">Todos os Câmpus</option>
-                    <option value="fpolis">Florianópolis</option>
-                    <option value="sj">São José</option>
-                    <option value="palhoca">Palhoça</option>
-                </select>
-            </div>
+          <section class="filtros-container">
+              <div class="filtro-grupo">
+                  <label>Câmpus:</label>
+                  <select>
+                      <option value="todos">Todos os Câmpus</option>
+                      <option value="fpolis">Florianópolis</option>
+                      <option value="sj">São José</option>
+                      <option value="palhoca">Palhoça</option>
+                  </select>
+              </div>
 
-            <div class="filtro-grupo">
-                <label>Faixa de Preço:</label>
-                <div class="inputs-preco">
-                    <input type="number" placeholder="Min" min="0" step="5">
-                    <input type="number" placeholder="Max" max="20000" step="5">
-                </div>
-            </div>
+              <div class="filtro-grupo">
+                  <label>Faixa de Preço:</label>
+                  <div class="inputs-preco">
+                      <input type="number" placeholder="Min" min="0" step="5">
+                      <input type="number" placeholder="Max" max="20000" step="5">
+                  </div>
+              </div>
 
-            <div class="filtro-grupo">
-                <label>Condição:</label>
-                <select>
-                    <option value="todos">Qualquer uma</option>
-                    <option value="novo">Novo</option>
-                    <option value="usado">Usado - Excelente</option>
-                    <option value="usado-bom">Usado - Bom</option>
-                </select>
-            </div>
-        </section>
+              <div class="filtro-grupo">
+                  <label>Condição:</label>
+                  <select>
+                      <option value="todos">Qualquer uma</option>
+                      <option value="novo">Novo</option>
+                      <option value="usado">Usado - Excelente</option>
+                      <option value="usado-bom">Usado - Bom</option>
+                  </select>
+              </div>
+          </section>
 
-            <div class="resultados-info">
-                <p>Mostrando 12 resultados para "Eletrônicos"</p>
-                <select class="ordenacao">
-                    <option>Mais recentes</option>
-                    <option>Menor Preço</option>
-                    <option>Maior Preço</option>
-                </select>
-            </div>
+          <div class="resultados-info">
+              <p>Mostrando 12 resultados para "Eletrônicos"</p>
+              <select class="ordenacao">
+                  <option>Mais recentes</option>
+                  <option>Menor Preço</option>
+                  <option>Maior Preço</option>
+              </select>
+          </div>
 
-            <div class="grid-anuncios">
-                <?php 
-                    // Renderiza dinamicamente os mesmos cards ativos usando sua função existente
-                    $anuncios->listarAnunciosAtivos($conexao, $banco->anuncio); 
-                ?>
-            </div>
-        </div>
+          <div class="grid-anuncios">
+              <?php 
+                  // Atualizado: Passando o ID do aluno logado para a checagem dos corações
+                  $anuncios->listarAnunciosAtivos($conexao, $banco->anuncio, $_SESSION['id_aluno']); 
+              ?>
+          </div>
+      </div>
 
         <!--Tela de meus anuncios-->
         <div id="tela-meusanuncios" class="tela collapse">
@@ -166,7 +236,7 @@ if (!isset($_SESSION['id_aluno'])) {
             <section class="resumo-anuncios">
                 <?php
                     // Define o ID do usuário logado (exemplo)
-                    $id_usuario_logado = 1; 
+                    $id_usuario_logado = $_SESSION['id_aluno']; 
 
                     // Executa a função do arquivo externo e recebe os dados
                     $stats = $anuncios->obterContadoresUsuario($conexao, $banco->anuncio, $id_usuario_logado);
@@ -197,99 +267,90 @@ if (!isset($_SESSION['id_aluno'])) {
 
         <!--Tela de novo anuncio-->
         <div id="tela-novoanuncio" class="tela collapse">
-            <header class="header-pagina">
-                <h2>Criar Novo Anúncio</h2>
-                <p>Preencha os detalhes abaixo para publicar seu item.</p>
-            </header>
+          <header class="header-pagina">
+              <h2 id="titulo-tela-anuncio">Criar Novo Anúncio</h2>
+              <p>Preencha os detalhes abaixo para publicar seu item.</p>
+          </header>
 
-            <form class="form-anuncio" method="post" action="index.php" enctype="multipart/form-data">
-                <input type="hidden" name="id_vendedor" value="1">
-                <section class="sessao-form">
-                    <h3>Informações Básicas</h3>
-                    <div class="campo">
-                        <label for="titulo">Título do Anúncio *</label>
-                        <input type="text" id="titulo" name="titulo-anuncio" placeholder="Ex: Livro Cálculo A - Diva Flemming" required>
-                    </div>
+          <form class="form-anuncio" method="post" action="index.php" enctype="multipart/form-data">
+              <input type="hidden" name="id_vendedor" value="<?php echo $_SESSION['id_aluno']; ?>">
+              
+              <input type="hidden" id="id_anuncio_edicao" name="id_anuncio" value="">
 
-                    <div class="fila-campos">
-                        <div class="campo">
-                            <label for="categoria">Categoria</label>
-                            <select id="categoria" name="categoria-anuncio">
-                                <option value="livros">Livros / Material Didático</option>
-                                <option value="eletronicos">Eletrônicos</option>
-                                <option value="moveis">Móveis</option>
-                                <option value="outros">Outros</option>
-                            </select>
-                        </div>
-                        <div class="campo">
-                            <label for="preco">Preço (R$)*</label>
-                            <input type="number" id="preco" name="preco-anuncio" step="0.01" placeholder="0,00" required>
-                        </div>
-                    </div>
-                </section>
+              <section class="sessao-form">
+                  <h3>Informações Básicas</h3>
+                  <div class="campo">
+                      <label for="titulo">Título do Anúncio *</label>
+                      <input type="text" id="titulo" name="titulo-anuncio" placeholder="Ex: Livro Cálculo A - Diva Flemming" required>
+                  </div>
 
-                <section class="sessao-form">
-                    <h3>Imagens e Descrição</h3>
-                    <div class="campo">
-                        <label>Fotos do Produto</label>
-                        <div class="upload-container">
-                            <input type="file" id="fotos" name="foto-anuncio" accept="image/*" onchange="mostrarConfirmacao(this)">
-                            
-                            <div class="upload-placeholder">
-                                <span id="texto-upload">📷 Clique para selecionar fotos</span>
-                                
-                                <br>
-                                <img id="preview-imagem" src="" alt="Prévia" style="display: none; max-width: 120px; max-height: 120px; margin-top: 10px; border-radius: 4px;">
-                            </div>
-                        </div>
+                  <div class="fila-campos">
+                      <div class="campo">
+                          <label for="categoria">Categoria</label>
+                          <select id="categoria" name="categoria-anuncio">
+                              <option value="LIVROS">Livros/Material Didático</option>
+                              <option value="ELETRÔNICOS">Eletrônicos</option>
+                              <option value="MÓVEIS">Móveis</option>
+                              <option value="OUTROS">Outros</option>
+                          </select>
+                      </div>
+                      <div class="campo" id="container-status-anuncio" style="display: none; margin-top: 15px;">
+                        <label for="status-anuncio">Status do Anúncio</label>
+                        <select id="status-anuncio" name="status-anuncio">
+                            <option value="EM ABERTO">Em Aberto 🟢</option>
+                            <option value="EM NEGOCIACAO">Em Negociação 🟡</option>
+                            <option value="VENDIDO">Vendido 🔴</option>
+                        </select>
                     </div>
-                    <div class="campo">
-                        <label for="descricao">Descrição Detalhada</label>
-                        <textarea id="descricao" rows="5" name="descricao-anuncio" placeholder="Descreva o estado do item, tempo de uso, etc."></textarea>
-                    </div>
-                </section>
+                      <div class="campo">
+                          <label for="preco">Preço (R$)*</label>
+                          <input type="number" id="preco" name="preco-anuncio" step="0.01" placeholder="0,00" required>
+                      </div>
+                  </div>
+              </section>
 
-                <div class="botoes-form">
-                    <button type="button" class="btn-cancelar" onclick="history.back()">Cancelar</button>
-                    <button type="submit" name="publicar-anuncio" class="btn-publicar">Publicar Anúncio</button>
-                </div>
-            </form>
-        </div>
+              <section class="sessao-form">
+                  <h3>Imagens e Descrição</h3>
+                  <div class="campo">
+                      <label>Fotos do Produto</label>
+                      <div class="upload-container">
+                          <input type="file" id="fotos" name="foto-anuncio" accept="image/*" onchange="mostrarConfirmacao(this)">
+                          
+                          <div class="upload-placeholder">
+                              <span id="texto-upload">📷 Clique para selecionar fotos</span>
+                              <br>
+                              <img id="preview-imagem" src="" alt="Prévia" style="display: none; max-width: 120px; max-height: 120px; margin-top: 10px; border-radius: 4px;">
+                          </div>
+                      </div>
+                  </div>
+                  <div class="campo">
+                      <label for="descricao">Descrição Detalhada</label>
+                      <textarea id="descricao" rows="5" name="descricao-anuncio" placeholder="Descreva o estado do item, tempo de uso, etc."></textarea>
+                  </div>
+              </section>
+
+              <div class="botoes-form">
+                  <button type="button" class="btn-cancelar" onclick="cancelarEdicaoAnuncio()">Cancelar</button>
+                  
+                  <button type="submit" id="btn-submit-anuncio" name="publicar-anuncio" class="btn-publicar">Publicar Anúncio</button>
+              </div>
+          </form>
+      </div>
         
         <!--Tela favoritos -->
         <div id="tela-favoritos" class="tela collapse">
-            <header class="header-favoritos">
-                <h2>Meus Favoritos</h2>
-                <p>Itens que você demonstrou interesse</p>
-            </header>
+          <header class="header-favoritos">
+              <h2>Meus Favoritos</h2>
+              <p>Itens que você demonstrou interesse</p>
+          </header>
 
-            <div class="grid-anuncios">
-                
-                <article class="card-anuncio">
-                    <button class="btn-remover-favorito" title="Remover dos favoritos">❤️</button>
-                    <div class="badge-campus">Câmpus São José</div>
-                    <div class="foto-placeholder">Imagem</div>
-                    <div class="info-anuncio">
-                        <h4>Arduíno Uno R3</h4>
-                        <p class="preco">R$ 50,00</p>
-                        <p class="vendedor">Vendido por: Carlos Tech</p>
-                        <button class="btn-detalhes">Ver Detalhes</button>
-                    </div>
-                </article>
-
-                <article class="card-anuncio">
-                    <button class="btn-remover-favorito" title="Remover dos favoritos">❤️</button>
-                    <div class="badge-campus">Câmpus Palhoça</div>
-                    <div class="foto-placeholder">Imagem</div>
-                    <div class="info-anuncio">
-                        <h4>Mesa Digitalizadora</h4>
-                        <p class="preco">R$ 250,00</p>
-                        <p class="vendedor">Vendido por: Ana Design</p>
-                        <button class="btn-detalhes">Ver Detalhes</button>
-                    </div>
-                </article>
-            </div>
-        </div>
+          <div class="grid-anuncios">
+              <?php 
+                  // Atualizado: Limpo os exemplos estáticos e inserida a chamada dinâmica dos favoritos
+                  $anuncios->listarFavoritosDoAluno($conexao, $banco->anuncio, $_SESSION['id_aluno']); 
+              ?>
+          </div>
+      </div>
         
         <!--Tela perfil-->
         <div id="tela-perfil" class="tela collapse">
@@ -297,12 +358,6 @@ if (!isset($_SESSION['id_aluno'])) {
                 <h2>Configurações do Perfil</h2>
                 <p>Gerencie suas informações públicas e de segurança.</p>
             </header>
-
-            <?php
-                    // Apenas manda o objeto carregar as informações do banco para dentro dele
-                    $alunos->carregarDadosPerfil($conexao, $banco->aluno);
-                    ?>
-
             <section class="secao-perfil">
                 <div class="perfil-topo">
                     <div class="avatar-edit">
@@ -359,68 +414,6 @@ if (!isset($_SESSION['id_aluno'])) {
                     </form>
             </section>
         </div>
-        
-        <!--Tela adm-->
-        <div id="tela-admin" class="tela collapse">
-            <header class="header-admin">
-                <h2>Painel de Controle Administrativo</h2>
-                <p>Monitoramento de anúncios e usuários do sistema.</p>
-            </header>
-
-            <section class="cards-estatisticas">
-                <div class="card-stat">
-                    <h3>1.240</h3>
-                    <p>Total de Anúncios</p>
-                </div>
-                <div class="card-stat">
-                    <h3>850</h3>
-                    <p>Usuários Ativos</p>
-                </div>
-                <div class="card-stat alerta">
-                    <h3>12</h3>
-                    <p>Denúncias Pendentes</p>
-                </div>
-            </section>
-
-            <section class="tabela-moderacao">
-                <h3>Fila de Moderação (Denúncias)</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Anúncio</th>
-                            <th>Vendedor</th>
-                            <th>Motivo</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>#452</td>
-                            <td>iPhone 12 Trincado</td>
-                            <td>aluno.teste@...</td>
-                            <td class="tag-critica">Preço Abusivo</td>
-                            <td>
-                                <button class="btn-tabela ver">Analisar</button>
-                                <button class="btn-tabela ban">Remover</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#455</td>
-                            <td>Respostas Cálculo 1</td>
-                            <td>estudante.x@...</td>
-                            <td class="tag-aviso">Conteúdo Impróprio</td>
-                            <td>
-                                <button class="btn-tabela ver">Analisar</button>
-                                <button class="btn-tabela ban">Remover</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-        </div>
-
-
     </main>
 
     <aside class="blocoDireito">
@@ -443,18 +436,9 @@ if (!isset($_SESSION['id_aluno'])) {
     </aside>
     
     <?php
-    // Processa o cadastro apenas se o botão do formulário foi clicado
-    if(isset($_POST['publicar-anuncio'])){
-        $anuncios->receberDadosForm($conexao);
-        $anuncios->cadastrar($conexao, $banco->anuncio);
-        
-        // REDIRECIONAMENTO CRÍTICO: Limpa os dados do POST e recarrega a página index limpa
-        header("Location: index.php?cadastro=sucesso");
-        exit();
+    if (isset($banco) && isset($conexao)) {
+        $banco->desconectar($conexao);
     }
-
-    // Fecha a conexão com segurança no fim de tudo
-    $banco->desconectar($conexao);
     ?>
 
 </body>

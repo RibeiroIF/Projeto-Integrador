@@ -72,34 +72,103 @@
         $conexao->query($sql) or die($conexao->error);
     }
 
-   function listarAnunciosAtivos($conexao, $anuncio){
-    // Ajustado o nome da coluna para 'status' conforme o seu CREATE TABLE
-    $sql = "SELECT * FROM $anuncio WHERE status = 'EM ABERTO' ORDER BY data_publicacao DESC";
+   function listarAnunciosAtivos($conexao, $anuncio, $id_aluno_logado){
+    // 🔴 ALTERADO: Removido o "WHERE a.status = 'EM ABERTO'" para listar todos os estados
+    $sql = "SELECT a.*, f.id_aluno AS favoritado 
+            FROM $anuncio a 
+            LEFT JOIN favoritos f ON a.id = f.id_anuncio AND f.id_aluno = $id_aluno_logado
+            ORDER BY a.data_publicacao DESC";
+            
     $resultado = $conexao->query($sql) or die($conexao->error);
 
-    if($resultado->num_rows == 0){ // Corrigido para num_rows que avalia linhas retornadas no SELECT
+    if($resultado->num_rows == 0){ 
         echo "<p class='aviso-vazio' style='grid-column: 1/-1; text-align: center; color: #777; padding: 20px;'>Nenhum anúncio disponível no momento.</p>";
     }
     else {
-        // Varre o banco de dados montando a estrutura de cards igual ao seu index
         while($vetorRegistro = $resultado->fetch_array()){
             $id        = htmlentities($vetorRegistro[0], ENT_QUOTES, "UTF-8");
             $titulo    = htmlentities($vetorRegistro[1], ENT_QUOTES, "UTF-8");
             $preco     = htmlentities($vetorRegistro[3], ENT_QUOTES, "UTF-8");
-            $imagem    = htmlentities($vetorRegistro[4], ENT_QUOTES, "UTF-8"); // ÍNDICE CORRIGIDO
-            $descricao = htmlentities($vetorRegistro[5], ENT_QUOTES, "UTF-8"); // ÍNDICE CORRIGIDO
+            $imagem    = htmlentities($vetorRegistro[4], ENT_QUOTES, "UTF-8"); 
+            $descricao = htmlentities($vetorRegistro[5], ENT_QUOTES, "UTF-8"); 
+            
+            // 🟢 NOVO: Captura o status do ENUM (Posição 6 na tabela anuncio)
+            $statusAnuncio = $vetorRegistro[6]; 
+            
+            $id_aluno  = htmlentities($vetorRegistro[10], ENT_QUOTES, "UTF-8");
+
+            // 🟢 NOVO: Monta a estrutura visual do pequeno ícone/tag de status
+            $badgeStatus = "";
+            if ($statusAnuncio == "EM NEGOCIACAO") {
+                $badgeStatus = "<span style='background: #ffc107; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 5px;'>🤝 Em Negociação</span>";
+            } elseif ($statusAnuncio == "VENDIDO") {
+                $badgeStatus = "<span style='background: #dc3545; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 5px;'>💰 Vendido</span>";
+            } else {
+                $badgeStatus = "<span style='background: #28a745; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 5px;'>🟢 Disponível</span>";
+            }
+
+            // Define se o coração começa cheio ou vazio baseando-se no retorno do JOIN
+            $coracao = !empty($vetorRegistro['favoritado']) ? '❤️' : '🤍';
+
+            $precoFormatado = number_format($preco, 2, ',', '.');
+
+            $tagImagem = (!empty($imagem) && file_exists($imagem)) 
+            ? "<img src='$imagem' alt='$titulo' style='width: 100%; height: 100%; object-fit: cover;'>" 
+            : "<div class='foto-placeholder'>Sem Imagem</div>";
+
+            // Inserido o $badgeStatus logo abaixo do título do anúncio
+            echo "
+            <article class='card-anuncio' style='position: relative;'>
+                <button class='btn-favorito' data-id='$id' onclick='alternarFavorito(this)' title='Favoritar item' style='position: absolute; top: 10px; right: 10px; z-index: 10; background: rgba(255,255,255,0.8); border:none; border-radius:50%; width:35px; height:35px; cursor:pointer;'>
+                    $coracao
+                </button>
+                
+                <div class='badge-campus'>Câmpus Principal</div>
+                
+                <div class='foto-placeholder-container' style='height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f0f0f0;'>
+                    $tagImagem
+                </div>
+
+                <div class='info-anuncio'>
+                    <h4>$titulo</h4>
+                    
+                    <div>$badgeStatus</div>
+                    
+                    <p class='preco'>R$ $precoFormatado</p>
+                    <p class='vendedor'>Vendedor ID: $id_aluno</p>
+                    <button class='btn-detalhes' onclick='verDetalhes($id)'>Ver Detalhes</button>
+                </div>
+            </article>";
+        }
+    }
+}
+
+function listarAnunciosAdmin($conexao, $anuncio){
+    // Query limpa, sem JOINs, pois admin não tem favoritos
+    $sql = "SELECT * FROM $anuncio WHERE status = 'EM ABERTO' ORDER BY data_publicacao DESC";
+    $resultado = $conexao->query($sql) or die($conexao->error);
+
+    if($resultado->num_rows == 0){ 
+        echo "<p class='aviso-vazio' style='grid-column: 1/-1; text-align: center; color: #777; padding: 20px;'>Nenhum anúncio disponível no momento.</p>";
+    }
+    else {
+        while($vetorRegistro = $resultado->fetch_array()){
+            $id        = htmlentities($vetorRegistro[0], ENT_QUOTES, "UTF-8");
+            $titulo    = htmlentities($vetorRegistro[1], ENT_QUOTES, "UTF-8");
+            $preco     = htmlentities($vetorRegistro[3], ENT_QUOTES, "UTF-8");
+            $imagem    = htmlentities($vetorRegistro[4], ENT_QUOTES, "UTF-8"); 
+            $descricao = htmlentities($vetorRegistro[5], ENT_QUOTES, "UTF-8"); 
             $id_aluno  = htmlentities($vetorRegistro[10], ENT_QUOTES, "UTF-8");
 
             $precoFormatado = number_format($preco, 2, ',', '.');
 
-            // Verifica se o arquivo de imagem realmente existe, senão usa uma padrão
             $tagImagem = (!empty($imagem) && file_exists($imagem)) 
                 ? "<img src='$imagem' alt='$titulo' style='width: 100%; height: 100%; object-fit: cover;'>" 
                 : "<div class='foto-placeholder'>Sem Imagem</div>";
 
-            // Mantendo as classes CSS originais do seu grid anterior ('card-anuncio', 'badge-campus', 'info-anuncio', etc.)
+            // HTML idêntico, mas SEM o botão de coração
             echo "
-            <article class='card-anuncio'>
+            <article class='card-anuncio' style='position: relative;'>
                 <div class='badge-campus'>Câmpus Principal</div>
                 
                 <div class='foto-placeholder-container' style='height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f0f0f0;'>
@@ -135,17 +204,27 @@
             echo "<p class='aviso-vazio' style='grid-column: 1/-1; text-align: center; color: #777; padding: 20px;'>Você ainda não publicou nenhum anúncio.</p>";
         } else {
             while ($vetorRegistro = $resultado->fetch_array()) {
-                $id        = htmlentities($vetorRegistro[0], ENT_QUOTES, "UTF-8");
-                $titulo    = htmlentities($vetorRegistro[1], ENT_QUOTES, "UTF-8");
-                $preco     = htmlentities($vetorRegistro[3], ENT_QUOTES, "UTF-8");
-                $imagem    = htmlentities($vetorRegistro[4], ENT_QUOTES, "UTF-8");
-                $status    = htmlentities($vetorRegistro[6], ENT_QUOTES, "UTF-8"); // Supondo que status esteja no índice 6
+                $id         = htmlentities($vetorRegistro[0], ENT_QUOTES, "UTF-8");
+                $titulo     = htmlentities($vetorRegistro[1], ENT_QUOTES, "UTF-8");
+                $categoria  = htmlentities($vetorRegistro[2], ENT_QUOTES, "UTF-8"); 
+                $preco      = htmlentities($vetorRegistro[3], ENT_QUOTES, "UTF-8");
+                $imagem     = htmlentities($vetorRegistro[4], ENT_QUOTES, "UTF-8");
+                $descricao  = htmlentities($vetorRegistro[5], ENT_QUOTES, "UTF-8"); 
+                $status     = htmlentities($vetorRegistro[6], ENT_QUOTES, "UTF-8"); 
 
                 $precoFormatado = number_format($preco, 2, ',', '.');
 
-                // Define a classe do badge com base no status (Ex: EM ABERTO vira 'ativo', VENDIDO vira 'vendido')
-                $classeStatus = (strtolower($status) == 'em aberto') ? 'ativo' : 'vendido';
-                $textoStatus  = (strtolower($status) == 'em aberto') ? 'Ativo' : 'Vendido';
+                // 🟢 ETAPA 2 ATUALIZADA: Nova lógica para os 3 status do ENUM
+                if ($status === 'EM NEGOCIACAO') {
+                    $classeStatus = 'negociacao'; 
+                    $textoStatus  = '🤝 Em Negociação';
+                } elseif ($status === 'VENDIDO') {
+                    $classeStatus = 'vendido'; 
+                    $textoStatus  = '💰 Vendido';
+                } else {
+                    $classeStatus = 'ativo'; // Representa o 'EM ABERTO'
+                    $textoStatus  = '🟢 Disponível';
+                }
 
                 $tagImagem = (!empty($imagem) && file_exists($imagem)) 
                     ? "<img src='$imagem' alt='$titulo' style='width: 40px; height: 40px; object-fit: cover; border-radius: 4px;'>" 
@@ -153,21 +232,119 @@
 
                 // Renderiza o HTML usando as classes da sua "lista-gerenciamento"
                 echo "
-                <article class='item-anuncio-gerenciar'>
-                    <div class='img-preview'>$tagImagem</div>
-                    <div class='detalhes-item'>
-                        <h4>$titulo</h4>
-                        <p class='preco'>R$ $precoFormatado</p>
-                        <span class='status-badge $classeStatus'>$textoStatus</span>
-                    </div>
-                    <div class='acoes-item'>
-                        <button class='btn-acao editar' onclick='editarAnuncio($id)'>Editar</button>
-                        <button class='btn-acao excluir' onclick='excluirAnuncio($id)'>Excluir</button>
-                    </div>
-                </article>";
+                  <article class='item-anuncio-gerenciar'>
+                      <div class='img-preview'>$tagImagem</div>
+                      <div class='detalhes-item'>
+                          <h4>$titulo</h4>
+                          <p class='preco'>R$ $precoFormatado</p>
+                          <span class='status-badge $classeStatus'>$textoStatus</span>
+                      </div>
+                      <div class='acoes-item'>
+                          <button class='btn-acao editar' onclick='prepararEdicao($id, \"$titulo\", \"$categoria\", $preco, \"$descricao\", \"$imagem\", \"$status\")'>Editar</button>
+                          <button class='btn-acao excluir' onclick='confirmarExclusao($id)'>Excluir</button>
+                      </div>
+                  </article>";
             }
         }
     }
+
+    function listarFavoritosDoAluno($conexao, $anuncio, $id_aluno_logado){
+    $sql = "SELECT a.* FROM $anuncio a 
+            INNER JOIN favoritos f ON a.id = f.id_anuncio 
+            WHERE f.id_aluno = $id_aluno_logado AND a.status = 'EM ABERTO'
+            ORDER BY f.data_favoritado DESC";
+            
+    $resultado = $conexao->query($sql) or die($conexao->error);
+
+    if($resultado->num_rows == 0){ 
+        echo "<p class='aviso-vazio' style='grid-column: 1/-1; text-align: center; color: #777; padding: 20px;'>Você ainda não favoritou nenhum anúncio.</p>";
+    }
+    else {
+        while($vetorRegistro = $resultado->fetch_array()){
+            $id        = htmlentities($vetorRegistro[0], ENT_QUOTES, "UTF-8");
+            $titulo    = htmlentities($vetorRegistro[1], ENT_QUOTES, "UTF-8");
+            $preco     = htmlentities($vetorRegistro[3], ENT_QUOTES, "UTF-8");
+            $imagem    = htmlentities($vetorRegistro[4], ENT_QUOTES, "UTF-8"); 
+            $id_aluno  = htmlentities($vetorRegistro[10], ENT_QUOTES, "UTF-8");
+
+            $precoFormatado = number_format($preco, 2, ',', '.');
+
+            $tagImagem = (!empty($imagem) && file_exists($imagem)) 
+                ? "<img src='$imagem' alt='$titulo' style='width: 100%; height: 100%; object-fit: cover;'>" 
+                : "<div class='foto-placeholder'>Sem Imagem</div>";
+
+            // REMOVIDO o <button class='btn-favorito'> para ser apenas exibição
+            echo "
+            <article class='card-anuncio' style='position: relative;' data-id-anuncio='$id'>
+                <div class='badge-campus'>Favoritado ❤️</div>
+                
+                <div class='foto-placeholder-container' style='height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f0f0f0;'>
+                    $tagImagem
+                </div>
+
+                <div class='info-anuncio'>
+                    <h4>$titulo</h4>
+                    <p class='preco'>R$ $precoFormatado</p>
+                    <p class='vendedor'>Vendedor ID: $id_aluno</p>
+                    <button class='btn-detalhes' onclick='verDetalhes($id)'>Ver Detalhes</button>
+                </div>
+            </article>";
+        }
+    }
+}
+
+function atualizar($conexao, $nomeTabela, $id_anuncio) {
+    // 1. Coleta os dados novos do formulário
+    $titulo    = $this->titulo;
+    $categoria = $this->categoria;
+    $preco     = $this->preco;
+    $descricao = $this->descricao;
+    
+    // 🆕 NOVO: Captura o status vindo do select do formulário. 
+    // Se não for enviado (caso o campo estivesse oculto), define como 'EM ABERTO' por padrão.
+    $status    = isset($_POST['status-anuncio']) ? $_POST['status-anuncio'] : 'EM ABERTO';
+    
+    // 2. Busca a imagem antiga diretamente no banco, caso o usuário não tenha enviado uma nova
+    $sql_busca = "SELECT imagem FROM $nomeTabela WHERE id = $id_anuncio";
+    $resultado = $conexao->query($sql_busca);
+    $anuncio_atual = $resultado->fetch_assoc();
+    $imagem = $anuncio_atual['imagem']; 
+
+    // 3. Processa a nova imagem apenas se o usuário tiver feito o upload de uma nova
+    if (isset($_FILES['foto-anuncio']) && $_FILES['foto-anuncio']['error'] === UPLOAD_ERR_OK) {
+        $diretorio = "../uploads/"; 
+        if (!file_exists($diretorio)) {
+            mkdir($diretorio, 0777, true);
+        }
+
+        $extensao = pathinfo($_FILES['foto-anuncio']['name'], PATHINFO_EXTENSION);
+        $novoNome = uniqid("img_") . "." . $extensao;
+        $caminhoCompleto = $diretorio . $novoNome;
+
+        if (move_uploaded_file($_FILES['foto-anuncio']['tmp_name'], $caminhoCompleto)) {
+            if (!empty($imagem) && file_exists($imagem)) {
+                unlink($imagem);
+            }
+            $imagem = $caminhoCompleto; 
+        }
+    }
+
+    // 4. 🆕 ATUALIZADO: Executa a query de atualização incluindo a coluna 'status'
+    $sql = "UPDATE $nomeTabela SET 
+            titulo = '$titulo', 
+            categoria = '$categoria', 
+            preco = $preco, 
+            descricao = '$descricao', 
+            imagem = '$imagem',
+            status = '$status' 
+            WHERE id = $id_anuncio";
+
+    if ($conexao->query($sql)) {
+        return true;
+    } else {
+        die("Erro ao atualizar o anúncio: " . $conexao->error);
+    }
+}
 
     function obterContadoresUsuario($conexao, $anuncio, $id_usuario_logado) {
         // 1. Conta anúncios ativos

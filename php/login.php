@@ -90,7 +90,7 @@
     require "criar-classe-aluno.php";
     require "criar-classe-admin.php";
 
-    $banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "avaliacao", "denuncia", "feedback");
+    $banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
 
     $conexao = $banco->criarConexao();
     $banco->criarBanco($conexao);
@@ -101,6 +101,28 @@
 
     $alunos = new Alunos();
     $admins = new Admin();
+
+    // ==========================================
+    // SISTEMA DE SEED (Criação automática dos Admins)
+    // ==========================================
+    $resultadoAdmins = $conexao->query("SELECT COUNT(*) FROM " . $banco->admin);
+    $totalAdmins = $resultadoAdmins->fetch_row()[0];
+
+    // Se a tabela de admins estiver zerada, cria o Gabriel e a Clara
+    if ($totalAdmins == 0) {
+        // Criando Gabriel
+        $_POST['login'] = 'gabriel@gmail.com';
+        $_POST['senha'] = 'gabriel123'; // Defina a senha real dele aqui
+        $admins->receberDadosForm($conexao);
+        $admins->cadastrar($conexao, $banco->admin);
+
+        // Criando Clara
+        $_POST['login'] = 'clara@gmail.com';
+        $_POST['senha'] = 'clara456'; // Defina a senha real dela aqui
+        $admins->receberDadosForm($conexao);
+        $admins->cadastrar($conexao, $banco->admin);
+    }
+    // ==========================================
 
     if(isset($_POST['logar-aluno'])){
         $alunos->logar($conexao, $banco->aluno);

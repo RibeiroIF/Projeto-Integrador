@@ -71,6 +71,7 @@
       // PASSO 2 INCLUÍDO AQUI: Guardando os dados reais do usuário logado na sessão
       $_SESSION["id_aluno"]    = $dadosUsuario['id'];    // ou $dadosUsuario[0]
       $_SESSION["email_aluno"] = $dadosUsuario['email']; // ou $dadosUsuario[1]
+      $_SESSION["usuario_login"] = $login;
 
       $this->redirecionarPagina("../php/index.php");
     }
@@ -82,64 +83,55 @@
     }
   }
 
-  function carregarDadosPerfil($conexao, $tabelaAluno) {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-
-    $id_usuario = $_SESSION["id_aluno"] ?? 0;
-
-    $sql = "SELECT * FROM $tabelaAluno WHERE id = '$id_usuario'";
+  function carregarDadosPerfil($conexao, $tabelaAluno, $id_aluno) {
+    $sql = "SELECT * FROM $tabelaAluno WHERE id = '$id_aluno'";
     $resultado = $conexao->query($sql) or die($conexao->error);
     
     if ($resultado->num_rows > 0) {
         $dados = $resultado->fetch_assoc();
         
-        $this->nome     = htmlentities($dados['nome'] ?? '', ENT_QUOTES, "UTF-8");
-        $this->email    = htmlentities($dados['email'] ?? '', ENT_QUOTES, "UTF-8");
-        $this->campus   = $dados['campus'] ?? ''; 
-        $this->whatsapp = htmlentities($dados['whatsapp'] ?? '', ENT_QUOTES, "UTF-8");
-        $this->bio      = htmlentities($dados['bio'] ?? '', ENT_QUOTES, "UTF-8");
+        // Puxam do banco de dados (colunas reais)
+        $this->nome  = htmlentities($dados['nome'] ?? '', ENT_QUOTES, "UTF-8");
+        $this->email = htmlentities($dados['email'] ?? '', ENT_QUOTES, "UTF-8");
         
-        // TRATAMENTO DA DATA INCLUÍDO AQUI:
-        // Pega a data do banco (Ex: 2024-03-15) e formata para o padrão brasileiro (15/03/2024)
-        if (!empty($dados['data_cadastro'])) { // Ajuste 'data_cadastro' para o nome exato da coluna no seu banco
+        // Como NÃO estão no banco, pegam do formulário (POST) se enviado, ou ficam vazios
+        $this->campus   = $_POST['campus'] ?? ''; 
+        $this->whatsapp = htmlentities($_POST['whatsapp'] ?? '', ENT_QUOTES, "UTF-8");
+        $this->bio      = htmlentities($_POST['bio'] ?? '', ENT_QUOTES, "UTF-8");
+        
+        if (!empty($dados['data_cadastro'])) { 
             $data = new DateTime($dados['data_cadastro']);
             $this->dataCadastro = $data->format('d/m/Y');
         } else {
             $this->dataCadastro = "N/A";
         }
     }
-  }
+}
 
   function atualizarPerfil($conexao, $tabelaAluno){
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    // Só permite atualizar se houver uma sessão válida de ID
     if(isset($_SESSION["id_aluno"])){
-      $id_usuario = $_SESSION["id_aluno"];
-      
-      $this->nome   = trim($conexao->escape_string($_POST["nome"]));
-      $this->campus = trim($conexao->escape_string($_POST["campus"]));
+        $id_usuario = $_SESSION["id_aluno"];
+        
+        $this->nome     = trim($conexao->escape_string($_POST["nome"]));
+        $this->campus   = trim($conexao->escape_string($_POST["campus"]));
+        $this->whatsapp = trim($conexao->escape_string($_POST["whatsapp"]));
+        $this->bio      = trim($conexao->escape_string($_POST["bio"]));
 
-      // Atualiza apenas as colunas existentes, ignorando whatsapp e bio (sem quebrar o banco)
-      $sql = "UPDATE $tabelaAluno SET nome = '$this->nome', campus = '$this->campus' WHERE id = '$id_usuario'";
-      
-      if($conexao->query($sql)){
-         echo "<script>
-                alert('Perfil atualizado com sucesso!');
-                window.location.href = 'index.php';
-              </script>";
-      } else {
-         echo "<script>
-                alert('Erro ao atualizar: " . $conexao->error . "');
-                window.location.href = 'index.php';
-              </script>";
-      }
+        // REMOVIDO o campus do UPDATE, atualizando APENAS o nome que existe no banco
+        $sql = "UPDATE $tabelaAluno SET nome = '$this->nome' WHERE id = '$id_usuario'";
+        
+        if($conexao->query($sql)){
+            // Removido o redirecionamento bruto por window.location para a página não perder o POST atualizado antes de renderizar
+            echo "<script>alert('Perfil atualizado na interface!');</script>";
+        } else {
+            echo "<script>alert('Erro ao atualizar: " . $conexao->error . "');</script>";
+        }
     }
-  }
+}
 
   function redirecionarPagina($endereco){
     header("location: $endereco");
