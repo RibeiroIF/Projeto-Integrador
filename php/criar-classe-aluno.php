@@ -8,6 +8,7 @@
   public $whatsapp;
   public $bio;
   public $dataCadastro;
+  public $foto_perfil;
  
   function receberDadosForm($conexao){
    // O ID é nulo no cadastro pois é auto_increment no banco
@@ -16,11 +17,8 @@
    // Criptografando a senha em SHA-256 para segurança antes de salvar
    $this->senha      = trim($conexao->escape_string($_POST["senha"]));
    $this->senha      = password_hash($this->senha, PASSWORD_ARGON2I);
-/*    $this->senha2       = hash("sha256", trim($conexao->escape_string($_POST["senha2"])));
    
-   if($this->senha = $this->senha2){
-    $this->senha        = password_hash($this->senha, PASSWORD_ARGON2I);
-   } */
+   $this->whatsapp = isset($_POST["whatsapp"]) ? trim($conexao->escape_string($_POST["whatsapp"])) : '';
 
    $this->dataCadastro = date("Y-m-d"); // Capta a data atual do sistema
    }
@@ -31,7 +29,9 @@
             '$this->nome',
             '$this->email',
             '$this->senha',
-            '$this->dataCadastro')";
+            '$this->whatsapp',
+            '$this->dataCadastro',
+            null)";
 
    $conexao->query($sql) or die($conexao->error);
    }
@@ -90,14 +90,18 @@
     if ($resultado->num_rows > 0) {
         $dados = $resultado->fetch_assoc();
         
-        // Puxam do banco de dados (colunas reais)
         $this->nome  = htmlentities($dados['nome'] ?? '', ENT_QUOTES, "UTF-8");
         $this->email = htmlentities($dados['email'] ?? '', ENT_QUOTES, "UTF-8");
         
-        // Como NÃO estão no banco, pegam do formulário (POST) se enviado, ou ficam vazios
-        $this->campus   = $_POST['campus'] ?? ''; 
-        $this->whatsapp = htmlentities($_POST['whatsapp'] ?? '', ENT_QUOTES, "UTF-8");
-        $this->bio      = htmlentities($_POST['bio'] ?? '', ENT_QUOTES, "UTF-8");
+        // AGORA PUXA DIRETO DO BANCO DE DADOS
+        $this->whatsapp = htmlentities($dados['whatsapp'] ?? '', ENT_QUOTES, "UTF-8");
+        
+        // 🟢 Mantido aqui a leitura da nova coluna do banco de dados
+        $this->foto_perfil  = $dados['foto_perfil'] ?? null;
+        
+        // Mantidos temporários exatamente conforme seu código original
+        $this->campus   = $_POST['campus'] ?? ($this->campus ?? 'Florianópolis'); 
+        $this->bio      = htmlentities($_POST['bio'] ?? ($dados['bio'] ?? ''), ENT_QUOTES, "UTF-8");
         
         if (!empty($dados['data_cadastro'])) { 
             $data = new DateTime($dados['data_cadastro']);
@@ -108,27 +112,66 @@
     }
 }
 
-  function atualizarPerfil($conexao, $tabelaAluno){
+  public function atualizarPerfil($conexao, $tabelaAluno, $arquivosEnviados = null) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
+    
+    $id_aluno = $_SESSION['id_aluno'];
 
-    if(isset($_SESSION["id_aluno"])){
-        $id_usuario = $_SESSION["id_aluno"];
-        
-        $this->nome     = trim($conexao->escape_string($_POST["nome"]));
-        $this->campus   = trim($conexao->escape_string($_POST["campus"]));
-        $this->whatsapp = trim($conexao->escape_string($_POST["whatsapp"]));
-        $this->bio      = trim($conexao->escape_string($_POST["bio"]));
+    // 📸 CENÁRIO A: Upload automático da foto pelo iframe oculto
+    if ($arquivosEnviados && isset($arquivosEnviados['foto_perfil']) && $arquivosEnviados['foto_perfil']['error'] === UPLOAD_ERR_OK) {
+        $extensao = strtolower(pathinfo($arquivosEnviados['foto_perfil']['name'], PATHINFO_EXTENSION));
+        $extensoes_permitidas = ['jpg', 'jpeg', 'png', 'webp'];
 
-        // REMOVIDO o campus do UPDATE, atualizando APENAS o nome que existe no banco
-        $sql = "UPDATE $tabelaAluno SET nome = '$this->nome' WHERE id = '$id_usuario'";
-        
-        if($conexao->query($sql)){
-            // Removido o redirecionamento bruto por window.location para a página não perder o POST atualizado antes de renderizar
-            echo "<script>alert('Perfil atualizado na interface!');</script>";
+        if (in_array($extensao, $extensoes_permitidas)) {
+            $diretorio_destino = 'php/uploads';
+            if (!is_dir($diretorio_destino)) {
+                mkdir($diretorio_destino, 0777, true);
+            }
+
+            // Busca a foto antiga para deletar do servidor
+            $busca_foto = $conexao->query("SELECT foto_perfil FROM $tabelaAluno WHERE id = $id_aluno");
+            $resultado_foto = $busca_foto->fetch_assoc();
+            $foto_antiga = $resultado_foto['foto_perfil'] ?? null;
+
+            $novo_nome_arquivo = $diretorio_destino . "/perfil_" . $id_aluno . "_" . time() . "." . $extensao;
+
+            if (move_uploaded_file($arquivosEnviados['foto_perfil']['tmp_name'], $novo_nome_arquivo)) {
+                if (!empty($foto_antiga) && file_exists($foto_antiga)) {
+                    unlink($foto_antiga);
+                }
+                
+                // Grava APENAS a nova foto no banco de dados
+                $conexao->query("UPDATE $tabelaAluno SET foto_perfil = '$novo_nome_arquivo' WHERE id = $id_aluno");
+            }
+        }
+        // Matamos a execução aqui! Como foi enviado pelo iframe oculto, 
+        // o PHP responde em branco e a página principal NÃO sofre reload.
+        exit(); 
+    }
+
+    // 📝 CENÁRIO B: Salvamento textual (Quando clica em "Salvar Alterações")
+    if (isset($_POST['nome'])) {
+        $nome     = $conexao->escape_string(trim($_POST['nome']));
+        $whatsapp = $conexao->escape_string(trim($_POST['whatsapp']));
+
+        // Mantém campus e bio no escopo do objeto
+        if (isset($_POST['campus'])) $this->campus = $_POST['campus'];
+        if (isset($_POST['bio'])) $this->bio = htmlentities($_POST['bio'], ENT_QUOTES, "UTF-8");
+
+        // Atualiza apenas os dados textuais, preservando a foto que já está no banco
+        $sql = "UPDATE $tabelaAluno SET 
+                    nome = '$nome', 
+                    whatsapp = '$whatsapp'
+                WHERE id = $id_aluno";
+
+        if ($conexao->query($sql)) {
+            // Agora sim, redireciona limpando o POST e aplicando o parâmetro de tela para a sua SPA
+            echo "<script>window.location.href = 'index.php';</script>";
+            exit();
         } else {
-            echo "<script>alert('Erro ao atualizar: " . $conexao->error . "');</script>";
+            die("Erro ao atualizar perfil: " . $conexao->error);
         }
     }
 }

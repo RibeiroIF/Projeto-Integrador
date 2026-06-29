@@ -69,6 +69,12 @@
                     <label>E-mail (Gmail, Hotmail, etc)</label>
                     <input type="email" name="email" placeholder="seuemail@exemplo.com" required>
                 </div>
+                
+                <div class="input-group">
+                    <label>WhatsApp / Telefone</label>
+                    <input type="tel" name="whatsapp" placeholder="(48) 99999-9999" required>
+                </div>
+
                 <div class="input-group">
                     <label>Crie uma Senha</label>
                     <input type="password" name="senha" placeholder="Mínimo 6 caracteres" required>

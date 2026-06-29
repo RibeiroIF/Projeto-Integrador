@@ -58,7 +58,9 @@
             nome varchar(40),
             email varchar(60),
             senha varchar(128),
+            whatsapp varchar(20),
             data_cadastro date,
+            foto_perfil VARCHAR(255) DEFAULT NULL,
             constraint pk_aluno primary key(id)
             ) ENGINE=innoDB;";
 
@@ -85,12 +87,12 @@
            imagem varchar(255) not null,
            descricao varchar(200),
            status enum ('EM ABERTO', 'EM NEGOCIACAO', 'VENDIDO') default 'EM ABERTO',
+           deletado INT DEFAULT 0,
            data_publicacao date,
            data_expiracao date,
            visualizacoes int,
            id_aluno int not null,
            constraint pk_anuncio primary key(id),
-           /* ALTERADO: Se o aluno for excluído, todos os seus anúncios somem em cascata */
            constraint fk_anuncio_aluno foreign key(id_aluno) references $this->aluno(id) on delete cascade
     ) ENGINE=innoDB;";
 
