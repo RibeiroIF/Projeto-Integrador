@@ -96,7 +96,7 @@
     require "criar-classe-aluno.php";
     require "criar-classe-admin.php";
 
-    $banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
+    $banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
 
     $conexao = $banco->criarConexao();
     $banco->criarBanco($conexao);
@@ -117,14 +117,14 @@
     // Se a tabela de admins estiver zerada, cria o Gabriel e a Clara
     if ($totalAdmins == 0) {
         // Criando Gabriel
-        $_POST['login'] = 'gabriel@gmail.com';
-        $_POST['senha'] = 'gabriel123'; // Defina a senha real dele aqui
+        $_POST['login'] = 'gabriel.souza.0702@gmail.com';
+        $_POST['senha'] = 'gab123'; // Defina a senha real dele aqui
         $admins->receberDadosForm($conexao);
         $admins->cadastrar($conexao, $banco->admin);
 
         // Criando Clara
         $_POST['login'] = 'clara@gmail.com';
-        $_POST['senha'] = 'clara456'; // Defina a senha real dela aqui
+        $_POST['senha'] = 'clara123'; // Defina a senha real dela aqui
         $admins->receberDadosForm($conexao);
         $admins->cadastrar($conexao, $banco->admin);
     }

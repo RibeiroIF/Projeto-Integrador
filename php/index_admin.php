@@ -20,7 +20,7 @@ if (!isset($_SESSION['id_admin'])) {
 }
 
 // Cria a conexão com o banco
-$banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favorito", "avaliacao", "denuncia", "feedback");
+$banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "favorito", "avaliacao", "denuncia", "feedback");
 $conexao = $banco->criarConexao();
 $banco->abrirBanco($conexao);
 $banco->definirCharset($conexao);

@@ -14,7 +14,7 @@ require_once "criar-banco-classificados.php";
 require_once "criar-classe-anuncio.php";
 
 // 3. Cria a conexão idêntica à da sua tela inicial
-$banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
+$banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
 $conexao = $banco->criarConexao();
 $banco->abrirBanco($conexao);
 $banco->definirCharset($conexao);

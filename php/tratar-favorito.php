@@ -17,7 +17,7 @@ if (!isset($_SESSION['id_aluno']) || !isset($_POST['id_anuncio'])) {
 
 try {
     // Instancia o banco com as credenciais padrões que você configurou
-    $banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
+    $banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
     $conexao = $banco->criarConexao();
     $banco->abrirBanco($conexao);
     $banco->definirCharset($conexao);

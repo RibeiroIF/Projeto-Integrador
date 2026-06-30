@@ -17,7 +17,7 @@ if (!isset($_SESSION['id_aluno'])) {
     exit();
 }
 // Cria a conexão (isso fica invisível para o navegador, não altera o visual)
-$banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
+$banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
 $conexao = $banco->criarConexao();
 $banco->abrirBanco($conexao);
 $banco->definirCharset($conexao);

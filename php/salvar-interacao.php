@@ -8,7 +8,7 @@ if (!isset($_SESSION['id_aluno'])) {
     exit();
 }
 
-$banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
+$banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
 $conexao = $banco->criarConexao();
 $banco->abrirBanco($conexao);
 
