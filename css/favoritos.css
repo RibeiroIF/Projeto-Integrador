@@ -1,57 +1,70 @@
-/* Estilos específicos para Favoritos */
+/* Estilos específicos para Favoritos - Padrão Sóbrio IFSC */
 
 .header-favoritos {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #dcdcdc;
+    padding-bottom: 10px;
+}
+
+.header-favoritos h2 {
+    color: #333333;
+    font-size: 1.4rem;
+    font-weight: 600;
 }
 
 .header-favoritos p {
-    color: #666;
+    color: #666666;
     font-size: 0.9rem;
+    margin-top: 5px;
 }
 
-/* Botão de Coração sobre o Card */
+/* Botão de Remoção sobre o Card (Mais discreto e plano) */
 .btn-remover-favorito {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: white;
-    border: none;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
+    background: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px; /* Formato quadrado/limpo em vez de círculo */
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     z-index: 5;
-    transition: 0.3s;
-    font-size: 1.2rem;
+    transition: background-color 0.2s, border-color 0.2s;
+    font-size: 1rem;
+    color: #666666;
 }
 
 .btn-remover-favorito:hover {
-    transform: scale(1.1);
-    background: #fff0f0;
+    background: #f8f9fa;
+    border-color: #bb2d3b;
+    color: #bb2d3b;
 }
 
-/* Bloco Direito Detalhes */
+/* Bloco Direito Detalhes / Resumo Técnico */
 .alerta-precos {
-    background: #f0f7ef;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px dashed var(--theme-color);
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid #dcdcdc; /* Substituído dashed chamativo por borda sólida clássica */
 }
 
 .alerta-precos h3 {
-    font-size: 1rem;
-    color: var(--side-bar-color);
-    margin-bottom: 10px;
+    font-size: 0.95rem;
+    color: #247530; /* Verde Escuro Institucional */
+    margin-bottom: 8px;
+    font-weight: 600;
 }
 
 .alerta-precos p {
     font-size: 0.85rem;
-    color: #555;
-    margin-bottom: 15px;
+    color: #555555;
+    margin-bottom: 12px;
+    line-height: 1.4;
 }
 
 .toggle-container {
@@ -59,5 +72,8 @@
     justify-content: space-between;
     align-items: center;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 500;
+    color: #333333;
+    border-top: 1px solid #e2e2e2;
+    padding-top: 10px;
 }

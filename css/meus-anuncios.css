@@ -1,138 +1,217 @@
-/* Estilos específicos para Meus Anúncios */
+/* ==========================================================================
+   TELA: MEUS ANÚNCIOS (GERENCIAMENTO DO ALUNO)
+   ========================================================================== */
 
+/* Cabeçalho da Tela */
 .header-meus-anuncios {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    border-bottom: 1px solid #dcdcdc;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.header-meus-anuncios h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #333333;
+    margin: 0;
 }
 
 .header-meus-anuncios p {
-    color: #666;
     font-size: 0.9rem;
+    color: #666666;
+    margin: 4px 0 0 0;
 }
 
+/* Botão + Novo Anúncio */
 .btn-anunciar-topo {
-    background-color: var(--side-bar-color);
-    color: white;
+    background-color: #2e7d32;
+    color: #ffffff;
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
     font-weight: 600;
+    border-radius: 0px;
     cursor: pointer;
-    transition: 0.3s;
+    transition: background-color 0.2s;
 }
 
-/* Mini Estatísticas */
+.btn-anunciar-topo:hover {
+    background-color: #1b5e20;
+}
+
+/* Painel superior de Mini Estatísticas */
 .resumo-anuncios {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 15px;
     margin-bottom: 30px;
 }
 
 .card-mini-stats {
-    background: white;
-    padding: 15px 25px;
-    border-radius: 12px;
-    flex: 1;
+    background: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 0px;
+    padding: 12px 18px;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .card-mini-stats span {
     font-size: 0.8rem;
-    color: #888;
+    color: #666666;
+    font-weight: 600;
     text-transform: uppercase;
 }
 
 .card-mini-stats strong {
-    font-size: 1.5rem;
-    color: var(--side-bar-color);
+    font-size: 1.6rem;
+    color: #1976d2;
+    font-weight: 700;
+    margin-top: 2px;
 }
 
-/* Lista de Itens */
+.card-mini-stats.stats-card-deletados {
+    border-left: 4px solid #bb2d3b;
+    background-color: #fff8f8;
+}
+
+.stats-txt-deletados {
+    color: #bb2d3b !important;
+}
+
+/* Lista de Gerenciamento (Layout de Linhas/Lista) */
 .lista-gerenciamento {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    width: 100%;
 }
 
+/* O Card em formato de Linha (Como era antes) */
 .item-anuncio-gerenciar {
-    background: white;
-    padding: 15px;
-    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 0px;
     display: flex;
     align-items: center;
+    padding: 15px;
     gap: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: 0.3s;
+    position: relative;
+    box-sizing: border-box;
 }
 
-.item-anuncio-gerenciar:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
+/* Miniatura da Foto na Linha */
 .img-preview {
     width: 80px;
     height: 80px;
-    background: #eee;
-    border-radius: 8px;
+    background-color: #f4f6f8;
+    border: 1px solid #e9ecef;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    flex-shrink: 0;
 }
 
+.img-mini-gerenciar {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.foto-placeholder-txt {
+    font-size: 0.75rem;
+    color: #888888;
+}
+
+/* Detalhes textuais alinhados na linha */
 .detalhes-item {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-grow: 1;
 }
 
-.status-badge {
-    font-size: 0.7rem;
-    padding: 3px 8px;
-    border-radius: 4px;
+.detalhes-item h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    color: #333333;
+}
+
+.detalhes-item .preco {
+    font-size: 1.1rem;
+    color: #2e7d32;
     font-weight: 700;
+    margin: 0;
+}
+
+/* Badge de Status Sóbrio */
+.detalhes-item .status-badge {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
     text-transform: uppercase;
 }
 
-.status-badge.ativo { background: #e8f5e9; color: #2e7d32; }
-.status-badge.vendido { background: #f5f5f5; color: #616161; }
+.detalhes-item .status-badge.ativo { background: #e8f5e9; color: #2e7d32; }
+.detalhes-item .status-badge.negociacao { background: #fff3e0; color: #e65100; }
+.detalhes-item .status-badge.vendido { background: #eceff1; color: #37474f; }
 
-/* Botões de Ação */
+/* Grupo de botões à direita (Não escapam pois estão protegidos pelo flex-shrink) */
 .acoes-item {
     display: flex;
     gap: 10px;
+    flex-shrink: 0;
 }
 
 .btn-acao {
-    padding: 8px 15px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    background: white;
-    cursor: pointer;
+    padding: 10px 20px;
     font-size: 0.85rem;
     font-weight: 600;
-    transition: 0.2s;
+    border: 1px solid #dcdcdc;
+    background-color: #ffffff;
+    color: #333333;
+    cursor: pointer;
+    border-radius: 0px;
+    transition: all 0.2s;
 }
 
-.btn-acao.editar:hover { background: #fff3e0; border-color: #ff9800; color: #ff9800; }
-.btn-acao.excluir:hover { background: #ffebee; border-color: #f44336; color: #f44336; }
-.btn-acao.ver:hover { background: #e3f2fd; border-color: #2196f3; color: #2196f3; }
-
-/* Bloco Direito Dicas */
-.dicas-venda h3 {
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    color: var(--dark-text);
+.btn-acao.editar:hover {
+    background-color: #e9ecef;
 }
 
-.dicas-venda ul {
-    list-style: none;
+.btn-acao.excluir {
+    background-color: #fff5f5;
+    border-color: #fcc2c2;
+    color: #bb2d3b;
 }
 
-.dicas-venda li {
-    font-size: 0.9rem;
-    margin-bottom: 10px;
-    color: #555;
+.btn-acao.excluir:hover {
+    background-color: #bb2d3b;
+    color: #ffffff;
+    border-color: #bb2d3b;
+}
+
+/* Faixa superior caso o item tenha sido removido */
+.badge-moderacao-aviso {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #bb2d3b;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.item-anuncio-gerenciar.item-banido {
+    border-top: 2px solid #bb2d3b;
+    padding-top: 22px; /* Dá espaço para a badge absoluta superior */
 }

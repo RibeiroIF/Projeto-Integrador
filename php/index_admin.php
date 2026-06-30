@@ -83,13 +83,13 @@ if (isset($_POST['deletar-anuncio-admin'])) {
     <link rel="icon" type="image/x-icon" href="https://rwnobrega.page/_assets/ifsc-logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/pesquisar.css">
     <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="../css/perfil.css">
     <link rel="stylesheet" href="../css/login.css">
     <script src="../javascript/troca-de-tela.js"></script>
     <script src="../javascript/ver-detalhes.js"></script> 
+    <script src="../javascript/feedbacks.js"></script> 
     <title>Classificados IFSC - Painel Admin</title>
 </head>
 <body>
@@ -125,7 +125,6 @@ if (isset($_POST['deletar-anuncio-admin'])) {
 
             <div class="grid-anuncios">
                 <?php 
-                    // Lista os mesmos anúncios que os alunos veem
                     $anuncios->listarAnunciosAdmin($conexao, $banco->anuncio); 
                 ?>
             </div>
@@ -147,6 +146,7 @@ if (isset($_POST['deletar-anuncio-admin'])) {
                     </h3>
                     <p>Total de Anúncios</p>
                 </div>
+                
                 <div class="card-stat">
                     <h3>
                         <?php 
@@ -157,8 +157,23 @@ if (isset($_POST['deletar-anuncio-admin'])) {
                     <p>Usuários Ativos</p>
                 </div>
 
-                <div class="card-stat" style="border-left: 5px solid #dc3545;">
-                    <h3 style="color: #dc3545;">
+                <div class="card-stat card-stat-feedback">
+                    <div class="card-stat-feedback-wrapper">
+                        <h3>
+                            <?php 
+                            $contFeedbacks = $conexao->query("SELECT COUNT(*) FROM feedback");
+                            echo $contFeedbacks ? $contFeedbacks->fetch_row()[0] : "0"; 
+                            ?>
+                        </h3>
+                        <p>Feedbacks Recebidos</p>
+                    </div>
+                    <button type="button" onclick="abrirListaFeedbacksAdmin()" class="btn-card-ver-feedbacks">
+                        Ver Feedbacks
+                    </button>
+                </div>
+
+                <div class="card-stat card-stat-denuncias">
+                    <h3>
                         <?php 
                         $contDenuncias = $conexao->query("SELECT COUNT(*) FROM `{$banco->denuncia}`");
                         echo $contDenuncias ? $contDenuncias->fetch_row()[0] : "0"; 
@@ -169,117 +184,187 @@ if (isset($_POST['deletar-anuncio-admin'])) {
             </section>
 
             <section class="tabela-moderacao">
-              <h3>Fila de Moderação (Denúncias)</h3>
-              <table>
-                  <thead>
-                      <tr>
-                          <th>ID Anúncio</th>
-                          <th>Motivo / Comentário</th>
-                          <th>Ações</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <?php
-                      // Busca dinâmica trazendo a lista de denúncias salvas no banco
-                      $sql_lista_denuncias = "SELECT id_anuncio, comentario FROM `{$banco->denuncia}` ORDER BY id DESC";
-                      $resultado_denuncias = $conexao->query($sql_lista_denuncias);
+                <h3>Fila de Moderação (Denúncias)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Anúncio</th>
+                            <th>Motivo / Comentário</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $sql_lista_denuncias = "SELECT id_anuncio, comentario FROM `{$banco->denuncia}` ORDER BY id DESC";
+                        $resultado_denuncias = $conexao->query($sql_lista_denuncias);
 
-                      if ($resultado_denuncias && $resultado_denuncias->num_rows > 0) {
-                          while ($linha = $resultado_denuncias->fetch_assoc()) {
-                              $idAnuncio = intval($linha['id_anuncio']);
-                              $comentario = htmlentities($linha['comentario'], ENT_QUOTES, "UTF-8");
+                        if ($resultado_denuncias && $resultado_denuncias->num_rows > 0) {
+                            while ($linha = $resultado_denuncias->fetch_assoc()) {
+                                $idAnuncio = intval($linha['id_anuncio']);
+                                $comentario = htmlentities($linha['comentario'], ENT_QUOTES, "UTF-8");
 
-                              echo "
-                              <tr>
-                                  <td>#$idAnuncio</td>
-                                  <td class='tag-critica'>$comentario</td>
-                                  <td>
-                                      <button onclick='verDetalhes($idAnuncio, true)' class='btn-tabela' style='background-color: #0d6efd; color: white; border: none; padding: 5px 10px; border-radius: 4px;'>
-                                          🔍 Abrir Anúncio
-                                      </button>
-                                  </td>
-                              </tr>";
-                          }
-                      } else {
-                          echo "<tr><td colspan='3' style='text-align:center; color: #777; padding: 15px;'>Nenhuma denúncia pendente na fila.</td></tr>";
-                      }
-                      ?>
-                  </tbody>
-              </table>
-          </section>
+                                echo "
+                                <tr>
+                                    <td>#$idAnuncio</td>
+                                    <td class='tag-critica'>$comentario</td>
+                                    <td>
+                                        <button onclick='verDetalhes($idAnuncio, true)' class='btn-tabela btn-tabela-abrir'>
+                                            Abrir Anúncio
+                                        </button>
+                                    </td>
+                                </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='3' class='tabela-vazia-txt'>Nenhuma denúncia pendente na fila.</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </section>
         </div>
 
     </main> 
+
     <aside class="blocoDireito">
         <div class="perfil-resumo">
             <h3>Meu Perfil</h3>
-            <div class="avatar-grande" style="background-color: #dc3545; color: white;">🛡️</div>
+            <div class="avatar-grande avatar-admin-moderador">🛡️</div>
             <p><strong>Moderador:</strong> <?php echo isset($_SESSION['login_admin']) ? $_SESSION['login_admin'] : 'Admin'; ?></p>
             <p class="avaliacao">Painel de Proteção</p>
         </div>
 
-        <div class="feedback-section text-center">
-            <h4 style="color: #dc3545;">Modo de Moderação</h4>
+        <div class="feedback-section text-center modera-info-box">
+            <h4>Modo de Moderação</h4>
             <p class="small text-muted">Use seus privilégios com cautela ao remover anúncios do banco de dados.</p>
         </div>
     </aside>
 
-    <div id="modal-detalhes" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center;">
-    
-        <div style="background: #fff; padding: 25px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; max-height: 90vh; overflow-y: auto;">
+    <div id="modalListaFeedbacksAdmin" class="modal-feedback-overlay">
+        <div class="modal-feedback-box modal-box-largo">
+            <div class="modal-feedback-header">
+                <h3>Feedbacks Enviados</h3>
+                <button type="button" class="btn-fechar-x" onclick="fecharListaFeedbacksAdmin()">&times;</button>
+            </div>
             
-            <button onclick="document.getElementById('modal-detalhes').style.display = 'none'" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 22px; cursor: pointer; color: #999;">&times;</button>
+            <div class="modal-feedback-scroll">
+                <table class="tabela-feedbacks-modal">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Usuário</th>
+                            <th>Prévia</th> <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $sql_feedbacks = "SELECT f.descricao, f.data_feedback, al.nome 
+                                          FROM feedback f 
+                                          INNER JOIN aluno al ON f.id_usuario = al.id 
+                                          ORDER BY f.id DESC";
+                        $resultado_feedbacks = $conexao->query($sql_feedbacks);
+
+                        if ($resultado_feedbacks && $resultado_feedbacks->num_rows > 0) {
+                            while ($f = $resultado_feedbacks->fetch_assoc()) {
+                                $nomeUser = htmlspecialchars($f['nome'], ENT_QUOTES, "UTF-8");
+                                $dataFmt = date("d/m/Y", strtotime($f['data_feedback']));
+                                $descCompleta = htmlspecialchars($f['descricao'], ENT_QUOTES, "UTF-8");
+                                
+                                // Cria a prévia limitando a 35 caracteres e põe '...' se cortar
+                                $previaTexto = mb_strimwidth($descCompleta, 0, 35, "...");
+
+                                echo "
+                                <tr>
+                                    <td>$dataFmt</td>
+                                    <td><strong>$nomeUser</strong></td>
+                                    <td class='coluna-previa-fb'>$previaTexto</td> <td>
+                                        <button type='button' onclick=\"exibirIndividualFeedback('$nomeUser', '$dataFmt', `{$descCompleta}`)\" class='btn-ver-fb-pequeno'>
+                                            Ler Texto
+                                        </button>
+                                    </td>
+                                </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='4' class='tabela-vazia-txt'>Nenhum feedback registrado.</td></tr>"; // Mudado para colspan='4'
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalLeituraIndividualFeedback" class="modal-feedback-overlay modal-index-superior">
+        <div class="modal-feedback-box modal-box-medio">
+            <div class="modal-feedback-header">
+                <h3>Conteúdo do Feedback</h3>
+                <button type="button" class="btn-fechar-x" onclick="fecharIndividualFeedback()">&times;</button>
+            </div>
+            <div class="modal-leitura-corpo">
+                <p class="modal-leitura-meta">
+                    <strong>Enviado por:</strong> <span id="ind-fb-autor">...</span> <br>
+                    <strong>Data:</strong> <span id="ind-fb-data">...</span>
+                </p>
+                <div class="modal-leitura-texto" id="ind-fb-conteudo">...</div>
+            </div>
+            <div class="modal-feedback-botoes">
+                <button type="button" class="btn-cancelar" onclick="fecharIndividualFeedback()">Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-detalhes" class="admin-modal-container">
+        <div class="admin-modal-conteudo">
+            <button onclick="document.getElementById('modal-detalhes').style.display = 'none'" class="admin-modal-fechar">&times;</button>
             
-            <div id="modal-carregando" style="text-align: center; padding: 30px 0;">
+            <div id="modal-carregando" class="admin-modal-loading-box">
                 <div class="spinner-border text-danger" role="status"></div>
-                <p style="margin-top: 10px; color: #666;">Carregando detalhes...</p>
+                <p>Carregando detalhes...</p>
             </div>
 
-            <div id="modal-dados-produto" style="display: none;">
-                <h3 id="detalhe-titulo" style="margin-top: 0; color: #333;">Título</h3>
-                <span id="detalhe-categoria" class="badge bg-secondary" style="margin-bottom: 15px;">Categoria</span>
+            <div id="modal-dados-produto" class="admin-modal-dados">
+                <h3 id="detalhe-titulo">Título</h3>
+                <span id="detalhe-categoria" class="badge bg-secondary">Categoria</span>
                 
-                <p style="margin: 0 0 10px 0; font-size: 15px; color: #ff9800;">
-                    ⭐ <span id="detalhe-media-nota" style="font-weight: bold;">0.0</span> 
-                    <span id="detalhe-total-notas" style="color: #777; font-size: 12px;">(0 avaliações)</span>
+                <p class="admin-modal-avaliacoes">
+                    Nota: <span id="detalhe-media-nota">0.0</span> 
+                    <span id="detalhe-total-notas">(0 avaliações)</span>
                 </p>
 
-                <p id="detalhe-status" style="font-weight: bold; margin: 5px 0 15px 0; font-size: 14px;"></p>
+                <p id="detalhe-status" class="admin-modal-status-txt"></p>
                 
-                <div style="height: 200px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border-radius: 4px; overflow: hidden; margin-bottom: 15px;">
-                    <img id="detalhe-imagem" src="" alt="Produto" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                <div class="admin-modal-img-wrapper">
+                    <img id="detalhe-imagem" src="" alt="Produto">
                 </div>
                 
-                <p class="preco" style="font-size: 20px; color: #28a745; font-weight: bold; margin: 10px 0;">R$ 0,00</p>
+                <p class="preco admin-modal-preco">R$ 0,00</p>
                 
-                <div style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;">
+                <div class="admin-modal-divider">
                     <h5>Descrição:</h5>
-                    <p id="detalhe-descricao" style="color: #666; font-size: 14px; line-height: 1.5; max-height: 80px; overflow-y: auto;"></p>
+                    <p id="detalhe-descricao" class="admin-modal-desc-p"></p>
                 </div>
 
-                <div style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px;">
+                <div class="admin-modal-divider">
                     <h5>Contato do Vendedor:</h5>
-                    <p style="font-size: 16px; font-weight: bold; color: #198754; margin: 5px 0;">
-                        📱 <span id="detalhe-whatsapp">...</span>
+                    <p class="admin-modal-whats-txt">
+                        WhatsApp: <span id="detalhe-whatsapp">...</span>
                     </p>
-                    <a id="btn-link-whatsapp" href="#" target="_blank" class="btn btn-success btn-sm" style="font-weight: bold; display: none;">Chamar no WhatsApp</a>
+                    <a id="btn-link-whatsapp" href="#" target="_blank" class="btn btn-success btn-sm admin-modal-whats-btn">Chamar no WhatsApp</a>
                 </div>
 
-                <div style="border-top: 1px solid #eee; padding-top: 10px; margin-top: 15px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="admin-modal-divider">
+                    <div class="admin-modal-denuncia-header">
                         <h5>Denúncias / Reclamações:</h5>
-                        <button onclick="abrirJanelaDenuncia()" style="background: #dc3545; color: #fff; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">🚨 Denunciar</button>
+                        <button onclick="abrirJanelaDenuncia()" class="admin-modal-btn-denunciar">Denunciar</button>
                     </div>
-                    <div id="lista-denuncias" style="max-height: 100px; overflow-y: auto; margin-top: 10px; background: #fafafa; padding: 8px; border-radius: 4px; font-size: 13px; color: #555;"></div>
+                    <div id="lista-denuncias" class="admin-modal-lista-denuncias"></div>
                 </div>
 
-                <div id="secao-admin-excluir" style="display: none; border-top: 2px solid #dc3545; padding-top: 15px; margin-top: 15px; background: #fff5f5; padding: 10px; border-radius: 4px;">
-                    <h5 style="color: #dc3545; margin-top: 0;">Painel de Moderação</h5>
-                    <p style="font-size: 13px; color: #555; margin-bottom: 8px;">Para excluir este anúncio, digite uma justificativa que será enviada ao aluno:</p>
-                    <textarea id="txt-motivo-exclusao" placeholder="Ex: Seu anúncio viola as regras da instituição por conter itens não permitidos..." style="width: 100%; height: 70px; padding: 6px; border: 1px solid #dc3545; border-radius: 4px; resize: none; box-sizing: border-box; font-size: 13px;"></textarea>
-                    <button onclick="confirmarExclusaoAdmin()" style="background: #dc3545; color: #fff; border: none; width: 100%; padding: 8px; margin-top: 8px; border-radius: 4px; font-weight: bold; cursor: pointer;">❌ Excluir Anúncio Permanentemente</button>
+                <div id="secao-admin-excluir" class="admin-painel-excluir-box">
+                    <h5>Painel de Moderação</h5>
+                    <p>Para excluir este anúncio, digite uma justificativa que será enviada ao aluno:</p>
+                    <textarea id="txt-motivo-exclusao" placeholder="Ex: Seu anúncio viola as regras da instituição..."></textarea>
+                    <button onclick="confirmarExclusaoAdmin()" class="admin-btn-deletar-master">Excluir Anúncio Permanentemente</button>
                 </div>
-
             </div>
         </div>
     </div>

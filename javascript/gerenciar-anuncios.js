@@ -60,31 +60,28 @@ function confirmarExclusao(idAnuncio) {
     }
 }
 
-function filtrarSPA(event) {
-    // 🛑 Impede o formulário de recarregar a página e ir para a index
-    event.preventDefault(); 
+function mostrarConfirmacao(input) {
+    const textoUpload = document.getElementById('texto-upload');
+    const previewImagem = document.getElementById('preview-imagem');
 
-    // Coleta todos os dados digitados no formulário
-    const form = document.getElementById('form-pesquisa-avancada');
-    const formData = new FormData(form);
-    
-    // Transforma os dados em parâmetros de URL (ex: busca=monitor&preco_min=10)
-    const params = new URLSearchParams(formData).toString();
+    // Verifica se o usuário realmente selecionou algum arquivo
+    if (input.files && input.files.length > 0) {
+        
+        // 1. Gera a prévia da primeira imagem
+        const leitor = new FileReader();
+        leitor.onload = function(e) {
+            previewImagem.src = e.target.result;
+            previewImagem.style.display = 'block'; // Torna a imagem visível
+            
+            // 2. Limpa o texto informativo para NÃO acumular "1 imagem selecionada" com a foto
+            textoUpload.innerHTML = ''; 
+        }
+        leitor.readAsDataURL(input.files[0]); // Lê o primeiro arquivo do input
 
-    // Faz a requisição em segundo plano para um arquivo PHP que só renderiza os cards
-    fetch('buscar_anuncios_ajax.php?' + params)
-        .then(response => response.text())
-        .then(html => {
-            // Substitui apenas o conteúdo do grid de anúncios da tela de pesquisa
-            document.querySelector('#tela-pesquisa .grid-anuncios').innerHTML = html;
-        })
-        .catch(error => console.error('Erro ao filtrar:', error));
-}
-
-function limparFiltrosSPA() {
-    const form = document.getElementById('form-form-pesquisa-avancada');
-    if(form) form.reset(); // Limpa todos os inputs
-    
-    // Dispara o filtro vazio para trazer todos os anúncios de volta
-    filtrarSPA(new Event('submit'));
+    } else {
+        // Se o usuário abrir a janela e cancelar, volta ao estado original sóbrio
+        textoUpload.innerHTML = 'Clique para selecionar fotos';
+        previewImagem.style.display = 'none';
+        previewImagem.src = "";
+    }
 }

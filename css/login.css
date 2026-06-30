@@ -1,230 +1,297 @@
-/* login.css */
+/* ==========================================================================
+   TELA DE LOGIN & CADASTRO (PADRÃO SÓBRIO IFSC)
+   ========================================================================== */
 
-/* Reset básico para garantir que o layout ocupe a tela toda */
-body.body-login {
+/* Plano de fundo integrado em tom leve de verde institucional */
+.body-login {
+    background-color: #adc0b1; /* Verde acinzentado suave que destaca as caixas brancas */
     margin: 0;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--side-bar-color); /* Verde IFSC */
     min-height: 100vh;
-    /* Forçamos 1 coluna para ignorar o grid de 3 colunas do main.css */
-    grid-template-columns: 1fr !important; 
 }
 
-/* Container que limita a largura da caixa branca */
 .login-container {
     width: 100%;
     max-width: 420px;
     padding: 20px;
+    box-sizing: border-box;
 }
 
-/* A caixa branca de login */
+/* Caixa de Login Principal */
 .login-box {
-    background: white;
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-top: 4px solid #2e7d32; /* Destaque verde institucional no topo */
+    border-radius: 0px;
+    padding: 35px 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); /* Sombra quase imperceptível para destacar do fundo */
+}
+
+/* Cabeçalho do Login */
+.login-header {
     text-align: center;
-}
-
-.login-logo {
-    width: 80px;
-    margin-bottom: 20px;
-}
-
-.login-header h1 {
-    font-size: 1.6rem;
-    color: var(--dark-text);
-    margin-bottom: 8px;
-}
-
-.login-header p {
-    font-size: 0.9rem;
-    color: #666;
     margin-bottom: 30px;
 }
 
-/* Estilo dos campos de entrada */
+.login-logo {
+    max-height: 60px;
+    width: auto;
+    margin-bottom: 12px;
+}
+
+.login-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333333;
+    margin: 0 0 6px 0;
+}
+
+.login-header p {
+    font-size: 0.85rem;
+    color: #666666;
+    margin: 0;
+}
+
+/* Estrutura dos Formulários e Inputs */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
 .input-group {
-    margin-bottom: 20px;
-    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .input-group label {
-    display: block;
     font-size: 0.85rem;
     font-weight: 600;
-    margin-bottom: 8px;
-    color: #444;
+    color: #444444;
 }
 
 .input-group input {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.95rem;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 0px;
+    font-size: 0.9rem;
     box-sizing: border-box;
-    transition: border-color 0.3s;
 }
 
-.input-group input:focus {
-    border-color: var(--theme-color);
-    outline: none;
-}
-
-/* Opções de Lembrar e Esqueci Senha */
+/* Links e Checkbox de opções rápidas */
 .login-options {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.8rem;
-    margin-bottom: 25px;
-    color: #666;
+    font-size: 0.85rem;
+    color: #555555;
+    margin: 4px 0;
+}
+
+.login-options label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.login-options input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
 }
 
 .login-options a {
-    color: var(--side-bar-color);
+    color: #1b5e20;
     text-decoration: none;
+    font-weight: 500;
 }
 
 .login-options a:hover {
     text-decoration: underline;
 }
 
-/* Botões */
+/* Grupo de Botões (Diferenciação de Cores) */
+.button-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+/* Botão padrão para formulários */
 .btn-login {
     width: 100%;
-    padding: 14px;
-    background-color: var(--theme-color);
-    color: white;
     border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 1rem;
+    padding: 11px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 0px;
     cursor: pointer;
-    transition: background 0.3s;
+    text-align: center;
+    transition: background-color 0.2s;
 }
 
-.btn-login:hover {
-    background-color: var(--side-bar-color);
+/* Botão Aluno - Verde Institucional */
+.button-group .btn-login[name="logar-aluno"] {
+    background-color: #2e7d32;
+    color: #ffffff;
 }
 
-/* Container para os botões ficarem lado a lado */
-.button-group {
-    display: flex;
-    gap: 12px; /* Espaçamento ideal entre os botões */
-    width: 100%;
+.button-group .btn-login[name="logar-aluno"]:hover {
+    background-color: #1b5e20;
 }
 
-/* Ajuste sutil no botão para que eles dividam o espaço igualmente */
-.button-group .btn-login {
-    flex: 1;
-    padding: 14px 8px; /* Reduz o padding lateral para evitar quebra de texto em telas menores */
-    font-size: 0.95rem; /* Ajuste leve no tamanho da fonte */
+/* Botão Admin - Grafite Sóbrio */
+.button-group .btn-login[name="logar-admin"] {
+    background-color: #455a64;
+    color: #ffffff;
 }
 
-/* Cor padrão (Verde Escuro) para o botão de Admin */
-.btn-login[name="logar-admin"] {
-    background-color: #1b5e20; /* Um tom de verde mais escuro/fechado */
+.button-group .btn-login[name="logar-admin"]:hover {
+    background-color: #263238;
 }
 
-/* Efeito Hover (passar o mouse) para o botão de Admin */
-.btn-login[name="logar-admin"]:hover {
-    background-color: #123e14; /* Um tom ainda mais escuro para o efeito de clique */
-}
-
-/* Divisor "ou" */
+/* Divisor Sóbrio de Ações */
 .divisor {
-    margin: 20px 0;
-    display: flex;
-    align-items: center;
-    color: #bbb;
-    font-size: 0.8rem;
-    text-transform: uppercase;
+    text-align: center;
+    position: relative;
+    margin: 25px 0;
 }
 
-.divisor::before, .divisor::after {
-    content: '';
-    flex: 1;
-    border-bottom: 1px solid #eee;
+.divisor::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+    background-color: #dcdcdc;
+    z-index: 1;
 }
 
 .divisor span {
-    padding: 0 10px;
+    background-color: #ffffff;
+    padding: 0 12px;
+    color: #888888;
+    font-size: 0.8rem;
+    position: relative;
+    z-index: 2;
+    text-transform: uppercase;
 }
 
-/* Botão de Cadastro (Outline) */
+/* Botão Secundário de Cadastro */
 .btn-cadastro {
-    display: block;
     width: 100%;
-    padding: 12px;
-    background: transparent;
-    color: var(--side-bar-color);
-    border: 2px solid var(--side-bar-color);
-    border-radius: 8px;
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #ccc;
+    padding: 11px;
+    font-size: 0.9rem;
     font-weight: 600;
-    font-size: 0.95rem;
+    border-radius: 0px;
     cursor: pointer;
-    transition: 0.3s;
-    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    transition: all 0.2s;
 }
 
 .btn-cadastro:hover {
-    background-color: #f0f7ef;
-    color: var(--theme-color);
-    border-color: var(--theme-color);
+    background-color: #fafafa;
+    border-color: #adadad;
 }
 
-/* --- MODAL (Pop-up) --- */
+.login-footer {
+    text-align: center;
+    margin-top: 25px;
+    border-top: 1px solid #eeeeee;
+    padding-top: 15px;
+}
+
+.login-footer p {
+    font-size: 0.75rem;
+    color: #888888;
+    margin: 0;
+}
+
+/* ==========================================================================
+   SISTEMA DE MODAL (CADASTRO EXTERNO)
+   ========================================================================== */
+
 .modal-overlay {
-    display: none; /* Controlado pelo login.js */
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* Escurecimento leve para manter o fundo verde visível */
+    display: none; /* Controlado via JS */
     align-items: center;
     justify-content: center;
+    z-index: 100;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
+/* Caixa Interna do Modal - Alinhada com o Padrão Verde */
 .modal-content {
-    background: white;
-    width: 90%;
-    max-width: 400px;
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-top: 4px solid #2e7d32; /* Mantém a consistência com o topo do login */
+    border-radius: 0px;
+    width: 100%;
+    max-width: 460px;
     padding: 30px;
-    border-radius: 15px;
+    box-sizing: border-box;
     position: relative;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-    animation: surgindo 0.3s ease-out;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-@keyframes surgindo {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
 }
 
 .modal-header h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #333333;
     margin: 0;
-    color: var(--side-bar-color);
-    font-size: 1.4rem;
 }
 
+/* Botão Fechar (X) */
 .btn-fechar {
-    position: absolute;
-    top: 15px;
-    right: 15px;
     background: none;
     border: none;
-    font-size: 1.5rem;
-    color: #aaa;
+    font-size: 1.6rem;
+    color: #888888;
     cursor: pointer;
+    padding: 0;
+    line-height: 1;
 }
 
 .btn-fechar:hover {
-    color: #333;
+    color: #333333;
 }
 
+.modal-desc {
+    font-size: 0.85rem;
+    color: #666666;
+    margin: 0 0 20px 0;
+}
+
+/* Botão de finalizar o cadastro segue a mesma cor verde de ação principal */
+.modal-content .btn-login {
+    background-color: #2e7d32;
+    color: #ffffff;
+    margin-top: 8px;
+}
+
+.modal-content .btn-login:hover {
+    background-color: #1b5e20;
+}

@@ -125,7 +125,7 @@
         $extensoes_permitidas = ['jpg', 'jpeg', 'png', 'webp'];
 
         if (in_array($extensao, $extensoes_permitidas)) {
-            $diretorio_destino = 'php/uploads';
+            $diretorio_destino = 'fotos-perfil';
             if (!is_dir($diretorio_destino)) {
                 mkdir($diretorio_destino, 0777, true);
             }

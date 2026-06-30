@@ -1,70 +1,85 @@
-/* Estilos específicos para a página de Pesquisa */
+/* Estilos específicos para a página de Pesquisa - Padrão Sóbrio IFSC */
 
 .header-pesquisa-avancada {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #dcdcdc;
+    padding-bottom: 10px;
 }
 
 .search-box-large {
     display: flex;
     gap: 10px;
-    background: white;
-    padding: 10px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    background: #ffffff;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #dcdcdc;
 }
 
 .search-box-large input {
     flex: 1;
     border: none;
     outline: none;
-    padding: 10px;
-    font-size: 1.1rem;
+    padding: 8px;
+    font-size: 1rem;
+    color: #333333;
+    background: transparent;
 }
 
 .btn-busca-principal {
     background-color: var(--side-bar-color);
     color: white;
     border: none;
-    padding: 10px 30px;
-    border-radius: 8px;
+    padding: 10px 24px;
+    border-radius: 4px;
     cursor: pointer;
-    font-weight: 600;
-    transition: 0.3s;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: background-color 0.2s;
 }
 
 .btn-busca-principal:hover {
     background-color: var(--hover-color);
 }
 
-/* Container de Filtros em Linha */
+/* Container de Filtros em Linha / Grid Técnico */
 .filtros-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 20px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 25px;
+    gap: 15px;
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid #dcdcdc;
+    margin-bottom: 20px;
 }
 
 .filtro-grupo {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .filtro-grupo label {
     font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--dark-text);
+    font-weight: 500;
+    color: #333333;
 }
 
 .filtro-grupo select, 
 .filtro-grupo input {
     padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    background-color: #fcfcfc;
     font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: #333333;
+}
+
+.filtro-grupo select:focus, 
+.filtro-grupo input:focus {
+    outline: none;
+    border-color: var(--theme-color);
 }
 
 .inputs-preco {
@@ -81,39 +96,59 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     font-size: 0.9rem;
-    color: #666;
+    color: #666666;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 8px;
 }
 
 .ordenacao {
-    padding: 5px;
-    border: none;
-    background: transparent;
-    font-weight: 600;
+    padding: 4px 8px;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    background: #ffffff;
+    font-weight: 500;
     color: var(--side-bar-color);
     cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.ordenacao:hover {
+    background-color: #f8f9fa;
+    border-color: #b5b5b5;
 }
 
 /* Histórico no Bloco Direito */
 .historico-pesquisa h3 {
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    color: var(--dark-text);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #333333;
 }
 
 .historico-pesquisa ul {
     list-style: none;
 }
 
+.historico-pesquisa li {
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.historico-pesquisa li:last-child {
+    border-bottom: none;
+}
+
 .historico-pesquisa li a {
     color: var(--side-bar-color);
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     display: block;
-    padding: 5px 0;
+    padding: 6px 0;
+    transition: color 0.2s;
 }
 
 .historico-pesquisa li a:hover {
-    text-decoration: underline;
+    text-decoration: none;
+    color: var(--hover-color);
 }
