@@ -31,9 +31,19 @@ $anuncios = new Anuncios();
 $alunos = new Alunos();
 
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && (isset($_POST["nome"]) || isset($_POST['atualizar-perfil']) || isset($_FILES['foto_perfil']))) {
-    // Passamos a superglobal $_FILES para o método conseguir ler a imagem enviada
-    $alunos->atualizarPerfil($conexao, $banco->aluno, $_FILES); 
+// 🚨 SUBSTITUA O BLOCO DE TRATAMENTO DO PERFIL NO INDEX.PHP POR ESTE:
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    
+    // Se veio arquivo de foto (Upload via Iframe)
+    if (!empty($_FILES['foto_perfil']['tmp_name'])) {
+        $alunos->atualizarPerfil($conexao, $banco->aluno, $_FILES);
+        exit(); // Força a parada imediata aqui para o iframe não prosseguir no script
+    }
+    
+    // Se veio o formulário de texto (Botão Salvar Alterações)
+    if (isset($_POST["nome"]) || isset($_POST['atualizar-perfil'])) {
+        $alunos->atualizarPerfil($conexao, $banco->aluno);
+    }
 }
 
 $alunos->carregarDadosPerfil($conexao, $banco->aluno, $_SESSION['id_aluno']);
@@ -409,6 +419,7 @@ if (isset($_POST['enviar-feedback-sistema'])) {
                     <button type="submit" id="btn-submit-anuncio" name="publicar-anuncio" class="btn-publicar">Publicar Anúncio</button>
                 </div>
             </form>
+            <iframe name="retorno_foto_segredo" id="retorno_foto_segredo" style="display:none;"></iframe>
         </div>
         
         <div id="tela-favoritos" class="tela collapse">

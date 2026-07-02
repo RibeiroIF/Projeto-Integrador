@@ -117,7 +117,7 @@
         session_start();
     }
     
-    $id_aluno = $_SESSION['id_aluno'];
+    $id_aluno = (int)$_SESSION['id_aluno'];
 
     // 📸 CENÁRIO A: Upload automático da foto pelo iframe oculto
     if ($arquivosEnviados && isset($arquivosEnviados['foto_perfil']) && $arquivosEnviados['foto_perfil']['error'] === UPLOAD_ERR_OK) {
@@ -125,38 +125,57 @@
         $extensoes_permitidas = ['jpg', 'jpeg', 'png', 'webp'];
 
         if (in_array($extensao, $extensoes_permitidas)) {
-            $diretorio_destino = 'fotos-perfil';
+            
+            // 1. Caminho Físico: __DIR__ está em "php/". Usamos "../" para subir para a raiz e entrar em "fotos-perfil"
+            $diretorio_destino = __DIR__ . '/../fotos-perfil';
+            
             if (!is_dir($diretorio_destino)) {
                 mkdir($diretorio_destino, 0777, true);
             }
 
-            // Busca a foto antiga para deletar do servidor
+            // Busca a foto antiga para deletar do servidor físico
             $busca_foto = $conexao->query("SELECT foto_perfil FROM $tabelaAluno WHERE id = $id_aluno");
             $resultado_foto = $busca_foto->fetch_assoc();
             $foto_antiga = $resultado_foto['foto_perfil'] ?? null;
 
-            $novo_nome_arquivo = $diretorio_destino . "/perfil_" . $id_aluno . "_" . time() . "." . $extensao;
+            $nome_base = "perfil_" . $id_aluno . "_" . time() . "." . $extensao;
+            
+            // Onde o arquivo vai ser gravado no HD do servidor
+            $caminho_servidor = $diretorio_destino . "/" . $nome_base;
+            
+            // Caminho do Banco: Como o index.php está na raiz, ele acessa direto "fotos-perfil/..."
+            $caminho_banco = "fotos-perfil/" . $nome_base; 
 
-            if (move_uploaded_file($arquivosEnviados['foto_perfil']['tmp_name'], $novo_nome_arquivo)) {
-                if (!empty($foto_antiga) && file_exists($foto_antiga)) {
-                    unlink($foto_antiga);
+            if (move_uploaded_file($arquivosEnviados['foto_perfil']['tmp_name'], $caminho_servidor)) {
+                
+                // Deleta a foto antiga se ela existir (reconstruindo o caminho a partir da pasta 'php/')
+                if (!empty($foto_antiga)) {
+                    $caminho_deletar = __DIR__ . '/../' . $foto_antiga;
+                    if (file_exists($caminho_deletar)) {
+                        @unlink($caminho_deletar);
+                    }
                 }
                 
-                // Grava APENAS a nova foto no banco de dados
-                $conexao->query("UPDATE $tabelaAluno SET foto_perfil = '$novo_nome_arquivo' WHERE id = $id_aluno");
+                // Grava o caminho limpo que o index.php consegue ler na raiz
+                $conexao->query("UPDATE $tabelaAluno SET foto_perfil = '$caminho_banco' WHERE id = $id_aluno");
+                
+                // Como está rodando dentro do iframe oculto, avisa o HTML pai para atualizar o link real
+                echo "<script>
+                    window.parent.document.getElementById('img-perfil-preview').src = '$caminho_banco';
+                </script>";
             }
         }
-        // Matamos a execução aqui! Como foi enviado pelo iframe oculto, 
-        // o PHP responde em branco e a página principal NÃO sofre reload.
+        // Matamos a execução aqui! O iframe oculto recebeu a resposta dele em background, 
+        // a imagem já salvou e a página principal NÃO sofre reload abrupto.
         exit(); 
     }
 
-    // 📝 CENÁRIO B: Salvamento textual (Quando clica em "Salvar Alterações")
+    // 📝 CENÁRIO B: Salvamento textual (Quando o usuário clica em "Salvar Alterações")
     if (isset($_POST['nome'])) {
         $nome     = $conexao->escape_string(trim($_POST['nome']));
         $whatsapp = $conexao->escape_string(trim($_POST['whatsapp']));
 
-        // Mantém campus e bio no escopo do objeto
+        // Mantém campus e bio no escopo do objeto se enviados
         if (isset($_POST['campus'])) $this->campus = $_POST['campus'];
         if (isset($_POST['bio'])) $this->bio = htmlentities($_POST['bio'], ENT_QUOTES, "UTF-8");
 
@@ -167,8 +186,8 @@
                 WHERE id = $id_aluno";
 
         if ($conexao->query($sql)) {
-            // Agora sim, redireciona limpando o POST e aplicando o parâmetro de tela para a sua SPA
-            echo "<script>window.location.href = 'index.php';</script>";
+            // Redireciona de volta para o index mantendo o parâmetro da SPA para abrir na aba perfil
+            echo "<script>window.location.href = 'index.php?tela=perfil';</script>";
             exit();
         } else {
             die("Erro ao atualizar perfil: " . $conexao->error);

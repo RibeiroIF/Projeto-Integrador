@@ -74,11 +74,11 @@ function verDetalhes(idAnuncio, isAdmin = false) {
                 // Status
                 const statusElement = document.getElementById('detalhe-status');
                 if (dados.status_anuncio === 'VENDIDO') { 
-                    statusElement.innerHTML = "Status: <span style='color: #dc3545;'>Vendido 🔴</span>";
+                    statusElement.innerHTML = "Status: <span style='color: #dc3545;'>Vendido</span>";
                 } else if (dados.status_anuncio === 'EM NEGOCIACAO') {
-                    statusElement.innerHTML = "Status: <span style='color: #ffc107;'>Em Negociação 🟡</span>";
+                    statusElement.innerHTML = "Status: <span style='color: #ffc107;'>Em Negociação</span>";
                 } else {
-                    statusElement.innerHTML = "Status: <span style='color: #28a745;'>Disponível 🟢</span>";
+                    statusElement.innerHTML = "Status: <span style='color: #28a745;'>Disponível</span>";
                 }
 
                 // Imagem

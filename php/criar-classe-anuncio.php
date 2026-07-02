@@ -316,49 +316,45 @@ function listarFavoritosDoAluno($conexao, $anuncio, $id_aluno_logado){
 }
 
 function atualizar($conexao, $nomeTabela, $id_anuncio) {
-    // 1. Coleta os dados novos do formulário
+    // 1. Coleta os dados novos que já foram tratados pelo receberDadosForm
     $titulo    = $this->titulo;
     $categoria = $this->categoria;
     $preco     = $this->preco;
     $descricao = $this->descricao;
     
-    // 🆕 NOVO: Captura o status vindo do select do formulário. 
-    // Se não for enviado (caso o campo estivesse oculto), define como 'EM ABERTO' por padrão.
-    $status    = isset($_POST['status-anuncio']) ? $_POST['status-anuncio'] : 'EM ABERTO';
+    $status    = isset($_POST['status-anuncio']) ? $conexao->escape_string($_POST['status-anuncio']) : 'EM ABERTO';
     
-    // 2. Busca a imagem antiga diretamente no banco, caso o usuário não tenha enviado uma nova
-    $sql_busca = "SELECT imagem FROM $nomeTabela WHERE id = $id_anuncio";
-    $resultado = $conexao->query($sql_busca);
-    $anuncio_atual = $resultado->fetch_assoc();
-    $imagem = $anuncio_atual['imagem']; 
-
-    // 3. Processa a nova imagem apenas se o usuário tiver feito o upload de uma nova
-    if (isset($_FILES['foto-anuncio']) && $_FILES['foto-anuncio']['error'] === UPLOAD_ERR_OK) {
-        $diretorio = "../uploads/"; 
-        if (!file_exists($diretorio)) {
-            mkdir($diretorio, 0777, true);
-        }
-
-        $extensao = pathinfo($_FILES['foto-anuncio']['name'], PATHINFO_EXTENSION);
-        $novoNome = uniqid("img_") . "." . $extensao;
-        $caminhoCompleto = $diretorio . $novoNome;
-
-        if (move_uploaded_file($_FILES['foto-anuncio']['tmp_name'], $caminhoCompleto)) {
-            if (!empty($imagem) && file_exists($imagem)) {
-                unlink($imagem);
+    // 2. Define a imagem com base no que o receberDadosForm capturou
+    // Se o usuário não enviou foto nova, o receberDadosForm definiu como "uploads/padrao.jpg".
+    // Nesses casos, precisamos buscar a imagem antiga no banco para não perder a foto real do produto!
+    if ($this->imagem === "uploads/padrao.jpg") {
+        $sql_busca = "SELECT imagem FROM $nomeTabela WHERE id = $id_anuncio";
+        $resultado = $conexao->query($sql_busca);
+        $anuncio_atual = $resultado->fetch_assoc();
+        $imagem = $anuncio_atual['imagem'] ?? "uploads/padrao.jpg"; 
+    } else {
+        // Se o receberDadosForm salvou uma foto nova, usamos ela!
+        $imagem = $this->imagem;
+        
+        // (Opcional) Busca a foto antiga para apagar do servidor física se quiser economizar espaço
+        $sql_busca = "SELECT imagem FROM $nomeTabela WHERE id = $id_anuncio";
+        $resultado = $conexao->query($sql_busca);
+        if ($anuncio_atual = $resultado->fetch_assoc()) {
+            $foto_velha = __DIR__ . '/../' . $anuncio_atual['imagem'];
+            if (!empty($anuncio_atual['imagem']) && file_exists($foto_velha) && !str_contains($foto_velha, 'padrao.jpg')) {
+                @unlink($foto_velha);
             }
-            $imagem = $caminhoCompleto; 
         }
     }
 
-    // 4. 🆕 ATUALIZADO: Executa a query de atualização incluindo a coluna 'status'
+    // 3. Executa a query de atualização com os dados corretos
     $sql = "UPDATE $nomeTabela SET 
-            titulo = '$titulo', 
-            categoria = '$categoria', 
-            preco = $preco, 
-            descricao = '$descricao', 
-            imagem = '$imagem',
-            status = '$status' 
+                titulo = '$titulo', 
+                categoria = '$categoria', 
+                preco = $preco, 
+                descricao = '$descricao', 
+                imagem = '$imagem',
+                status = '$status' 
             WHERE id = $id_anuncio";
 
     if ($conexao->query($sql)) {
