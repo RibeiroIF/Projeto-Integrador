@@ -1,0 +1,209 @@
+.header-pagina {
+    background-color: #f4f6f8;
+    border-left: 4px solid var(--side-bar-color); 
+    padding: 20px 25px;
+    margin-bottom: 30px;
+    border-top: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-pagina h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--side-bar-color);
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.header-pagina p {
+    font-size: 0.9rem;
+    color: #555555;
+    margin: 6px 0 0 0;
+}
+
+.form-anuncio {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.sessao-form {
+    border: 1px solid var(--border-color);
+    padding: 25px;
+    background-color: var(--card-bg);
+}
+
+.sessao-form h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark-text);
+    margin: 0 0 20px 0;
+    border-bottom: 2px solid var(--side-bar-color);
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 15px;
+}
+
+.campo label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #444444;
+}
+
+.campo input[type="text"],
+.campo input[type="number"],
+.campo select,
+.campo textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 0px; 
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: #333333;
+    background-color: #fcfcfc;
+    box-sizing: border-box;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+    border-color: var(--theme-color);
+    background-color: #ffffff;
+    outline: none;
+}
+
+.fila-campos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.sessao-form-midia {
+    display: grid;
+    grid-template-columns: 35% 1fr; 
+    gap: 25px;
+    align-items: stretch; 
+}
+
+@media (max-width: 768px) {
+    .sessao-form-midia {
+        grid-template-columns: 1fr;
+    }
+}
+
+.upload-container {
+    border: 2px dashed #ccc;
+    padding: 10px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    background-color: #fafafa;
+    height: 100%; 
+    min-height: 180px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.upload-container input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 0.9rem;
+    color: #666666;
+    z-index: 1;
+}
+
+.sessao-form-midia .campo-descricao {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.sessao-form-midia .campo-descricao textarea {
+    flex-grow: 1;
+    height: 100%;
+    min-height: 180px;
+    resize: none;
+}
+
+.upload-preview-img {
+    max-height: 160px;
+    max-width: 95%;
+    object-fit: contain; 
+    display: none;
+    border: 1px solid var(--border-color);
+    margin: 0 auto; 
+}
+
+#preview-imagem {
+    width: auto !important;        
+    height: auto !important;       
+    max-width: 95% !important;     
+    max-height: 170px !important;  
+    object-fit: contain !important;
+    margin: 0 auto !important;     
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.botoes-form {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+}
+
+.btn-cancelar {
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid var(--border-color);
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 0px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.btn-cancelar:hover { 
+    background-color: #e9ecef; 
+}
+
+.btn-publicar {
+    background-color: var(--side-bar-color);
+    color: #ffffff;
+    border: none;
+    padding: 10px 25px;
+    font-weight: 600;
+    border-radius: 0px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.btn-publicar:hover { 
+    background-color: var(--hover-color); 
+}

@@ -1,0 +1,215 @@
+.modal-feedback-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none; 
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-feedback-box {
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-top: 4px solid #2e7d32;
+    border-radius: 0px;
+    width: 100%;
+    max-width: 450px;
+    padding: 25px;
+    box-sizing: border-box;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+#modalListaFeedbacksAdmin .modal-feedback-box {
+    max-width: 700px;
+}
+
+#modalLeituraIndividualFeedback .modal-feedback-box {
+    max-width: 480px;
+}
+
+.modal-feedback-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.modal-feedback-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333333;
+}
+
+.modal-feedback-header .btn-fechar-x {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #888888;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.modal-feedback-header .btn-fechar-x:hover {
+    color: #333333;
+}
+
+.form-feedback-internor {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.grupo-campo-feedback {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.grupo-campo-feedback label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444444;
+}
+
+.grupo-campo-feedback textarea {
+    width: 100%;
+    border: 1px solid #dcdcdc;
+    border-radius: 0px;
+    padding: 10px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: #333333;
+    resize: vertical;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.grupo-campo-feedback textarea:focus {
+    border-color: #2e7d32;
+}
+
+.modal-feedback-scroll {
+    max-height: 350px;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.tabela-feedbacks-modal {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.tabela-feedbacks-modal th, 
+.tabela-feedbacks-modal td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #dcdcdc;
+    font-size: 0.9rem;
+}
+
+.tabela-feedbacks-modal th {
+    background-color: #f4f6f8;
+    color: #333333;
+    font-weight: 600;
+}
+
+.coluna-previa-fb {
+    color: #555555;
+    font-style: italic;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-ver-fb-pequeno {
+    background-color: #2e7d32;
+    color: #ffffff;
+    border: none;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-ver-fb-pequeno:hover {
+    background-color: #1b5e20;
+}
+
+.modal-leitura-corpo {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-leitura-meta {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #666666;
+}
+
+.modal-leitura-texto {
+    border: 1px solid #dcdcdc;
+    background-color: #fafafa;
+    padding: 15px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #333333;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 120px;
+}
+
+.modal-feedback-botoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 5px;
+    width: 100%;
+}
+
+.modal-feedback-botoes .btn-cancelar {
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #dcdcdc;
+    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 0px;
+}
+
+.modal-feedback-botoes .btn-cancelar:hover {
+    background-color: #f4f6f8;
+}
+
+.modal-feedback-botoes .btn-enviar {
+    background-color: #2e7d32;
+    color: #ffffff;
+    border: none;
+    padding: 8px 18px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 0px;
+    transition: background-color 0.2s;
+}
+
+.modal-feedback-botoes .btn-enviar:hover {
+    background-color: #1b5e20;
+}

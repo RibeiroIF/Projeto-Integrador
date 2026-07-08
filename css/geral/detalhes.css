@@ -1,0 +1,35 @@
+.msg-sem-denuncia {
+    color: #999;
+    margin: 0;
+}
+
+.item-denuncia {
+    border-bottom: 1px solid #eee;
+    padding: 4px 0;
+}
+
+.item-denuncia .data-denuncia {
+    font-size: 10px;
+    color: #aaa;
+}
+
+.status-vendido {
+    color: #dc3545;
+}
+
+.status-negociacao {
+    color: #ffc107;
+}
+
+.status-disponivel {
+    color: #28a745;
+}
+
+.alerta-remocao {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #f5c6cb;
+    margin-top: 10px;
+}

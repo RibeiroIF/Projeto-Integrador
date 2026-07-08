@@ -1,0 +1,41 @@
+.cards-estatisticas {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 15px !important;
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+@media (max-width: 992px) {
+    .cards-estatisticas {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+.card-stat-feedback {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-stat-feedback-wrapper {
+    text-align: center;
+}
+
+.btn-card-ver-feedbacks {
+    margin-top: 10px;
+    background-color: #ffffff;
+    color: #2e7d32;
+    border: 1px solid #2e7d32;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-card-ver-feedbacks:hover {
+    background-color: #2e7d32;
+    color: #ffffff;
+}
