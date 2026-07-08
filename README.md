@@ -31,6 +31,7 @@ O sistema também possui uma dinâmica de <u>Administrador</u> (os quais no mome
   <li><b>Deletar</b> o anúncio de algum aluno, seja através da <b>Página Inicial</b> ou <b>Painel Adm</b>, acompanhado de uma mensagem para justificativa, que chegará ao aluno</li>
 </ul>
 
+<hr>
 <h1 style="text-align: center"> Telas </h1>
 <h3> Para melhor entendimento das funções mencionadas anteriormente, segue abaixo uma visão geral das telas para realização delas </h3>
 
@@ -60,8 +61,81 @@ O sistema também possui uma dinâmica de <u>Administrador</u> (os quais no mome
 <h4>3.2 - Painel Adm</h4>
 <img src="imagens/readme/painel-adm-admin.JPG">
 
+<h3>4 - Detalhes</h3>
+<h4>4.1 Para aluno / Para administrador</h4>
+<img height="300px" src="imagens/readme/detalhes-aluno.JPG">
+<img height="300px" src="imagens/readme/detalhes-admin.JPG">
+
+<h3>5 - Feedbacks</h3>
+<h4>5.1 Para aluno</h4>
+<img height="250px" src="imagens/readme/feedback-aluno.JPG">
+<h4>5.2 Para admin (prévia)</h4>
+<img height="200px" src="imagens/readme/feedback-admin-previa.JPG">
+<h4>5.2 Para admin (texto)</h4>
+<img height="200px" src="imagens/readme/feedback-admin-texto.JPG">
 
 
 <hr>
-<p>Ainda Não Finalizado!!</p>
+<h1 style="text-align:center">Montagem</h1>
+<h3>Para montagem do sistema apresentado foram usadas tecnologias específicas e o conhecimento sobre estas adquiridas.<br>
+Para enunciá-las, apresentaremos por presença na aplicação, entre elas:</h3>
+
+<ul>
+  <li>Front-end
+    <ul>
+      <li>HTML</li>
+      <li>CSS</li>
+      <li>JavaScript</li>
+    </ul>
+  </li>
+</ul>
+<ul>
+  <li>Back-end
+    <ul>
+      <li>PHP</li>
+    </ul>
+  </li>
+</ul>
+<ul>
+  <li>Database
+    <ul>
+      <li>MySQL</li>
+    </ul>
+  </li>
+</ul>
+<ul>
+  <li>Testagem
+    <ul>
+      <li>WampServer64</li>
+      <li>MySQLWorkbench</li>
+    </ul>
+  </li>
+</ul>
+
 <hr>
+<h1 style="text-align:center">Considerações finais</h1>
+
+<h4>Em suma, o propósito do sistema foi utilizar de uma ideia voltada aos alunos do campus e implementá-la como conclusão do <u>Projeto Integrador</u><br>
+Durante sua montagem foram encontradas algumas dificuldades, como:</h4>
+
+<ul>
+  <li>Manipulação de imagens</li>
+  <li>Sincronização instantânea com JavaScript</li>
+  <li>Monitoramento do Administrador</li>
+  <li>Processo de exclusão permanente de anúncio</li>
+</ul>
+
+<h4>Porém apesar dos pontos mencionados fomos capazes de concluir sua produção, requerendo apenas pequenos ajustes e implementações futuras, tais como:</h4>
+
+<ul>
+  <li>Salvamento de login por dispositivo</li>
+  <li>Comunicação de feedbacks/motivos diretamente pelo contato do usuário</li>
+  <li>Novas funcionalidades para qualidade de uso</li>
+</ul>
+
+<h4>Para tal, este repositório permanecerá ativo e aberto a fim de aceitar sugestões e ideias que vierem a surgir ao longo do tempo.</h4>
+
+<h4>Agradecemos a todos que leram até aqui pela sua atenção e curiosidade sobre o sistema, e um até logo!!</h4>
+
+<p><b>Vídeo de Apresentação:</b> <a href="">neste link</a></p>
+<p><b>Autores:</b> <u>Gabriel Ribeiro de Souza</u> e <u>Clara Luna de Bem Barreto Cano</u></p>
