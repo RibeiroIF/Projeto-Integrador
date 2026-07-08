@@ -1,10 +1,10 @@
-<h1 style="text-align: center"> Classificados IFSC </h1>
+<h1 align="center"> Classificados IFSC </h1>
 
 <h4> Este sistema consiste em um website para realizar <u>Anúncios</u> de produtos entre os estudantes do IFSC, permitindo que o campus se integre ainda mais e conecte seus alunos através desta ideia <br>
 O sistema também possui uma dinâmica de <u>Administrador</u> (os quais no momento são os desenvolvedores do projeto). Estes são responsáveis pelo monitoramento do servidor e do controle de seu funcionamento, assim como vigília sobre as ações dos usuários ativos.</h4>
 <hr>
 
-<h1 style="text-align: center"> Funcionalidades </h1>
+<h1 align="center"> Funcionalidades </h1>
 <h3> Para seu uso completo e apropriado à sua finalidade, o sistema dispôe das seguintes funcionalidades: </h3>
 
 <p><b>Para Aluno:</b></p>
@@ -32,7 +32,7 @@ O sistema também possui uma dinâmica de <u>Administrador</u> (os quais no mome
 </ul>
 
 <hr>
-<h1 style="text-align: center"> Telas </h1>
+<h1 align="center"> Telas </h1>
 <h3> Para melhor entendimento das funções mencionadas anteriormente, segue abaixo uma visão geral das telas para realização delas </h3>
 
 <h3>1 - Telas Gerais</h3>
@@ -62,8 +62,9 @@ O sistema também possui uma dinâmica de <u>Administrador</u> (os quais no mome
 <img src="imagens/readme/painel-adm-admin.JPG">
 
 <h3>4 - Detalhes</h3>
-<h4>4.1 Para aluno / Para administrador</h4>
+<h4>4.1 Para aluno</h4>
 <img height="300px" src="imagens/readme/detalhes-aluno.JPG">
+<h4>4.2 Para administrador</h4>
 <img height="300px" src="imagens/readme/detalhes-admin.JPG">
 
 <h3>5 - Feedbacks</h3>
@@ -76,7 +77,7 @@ O sistema também possui uma dinâmica de <u>Administrador</u> (os quais no mome
 
 
 <hr>
-<h1 style="text-align:center">Montagem</h1>
+<h1 align="center">Montagem</h1>
 <h3>Para montagem do sistema apresentado foram usadas tecnologias específicas e o conhecimento sobre estas adquiridas.<br>
 Para enunciá-las, apresentaremos por presença na aplicação, entre elas:</h3>
 
@@ -113,7 +114,7 @@ Para enunciá-las, apresentaremos por presença na aplicação, entre elas:</h3>
 </ul>
 
 <hr>
-<h1 style="text-align:center">Considerações finais</h1>
+<h1 align="center">Considerações finais</h1>
 
 <h4>Em suma, o propósito do sistema foi utilizar de uma ideia voltada aos alunos do campus e implementá-la como conclusão do <u>Projeto Integrador</u><br>
 Durante sua montagem foram encontradas algumas dificuldades, como:</h4>
