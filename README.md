@@ -1,7 +1,7 @@
 <h1 align="center"> Classificados IFSC </h1>
 
-<h4> Este sistema consiste em um website para realizar <u>Anúncios</u> de produtos entre os estudantes do IFSC, permitindo que o campus se integre ainda mais e conecte seus alunos através desta ideia <br>
-O sistema também possui uma dinâmica de <u>Administrador</u> (os quais no momento são os desenvolvedores do projeto). Estes são responsáveis pelo monitoramento do servidor e do controle de seu funcionamento, assim como vigília sobre as ações dos usuários ativos.</h4>
+<h4> Este sistema consiste em um website para realizar <ins>Anúncios</ins> de produtos entre os estudantes do IFSC, permitindo que o campus se integre ainda mais e conecte seus alunos através desta ideia <br>
+O sistema também possui uma dinâmica de <ins>Administrador</ins> (os quais no momento são os desenvolvedores do projeto). Estes são responsáveis pelo monitoramento do servidor e do controle de seu funcionamento, assim como vigília sobre as ações dos usuários ativos.</h4>
 <hr>
 
 <h1 align="center"> Funcionalidades </h1>
@@ -139,4 +139,4 @@ Durante sua montagem foram encontradas algumas dificuldades, como:</h4>
 <h4>Agradecemos a todos que leram até aqui pela sua atenção e curiosidade sobre o sistema, e um até logo!!</h4>
 
 <p><b>Vídeo de Apresentação:</b> <a href="">neste link</a></p>
-<p><b>Autores:</b> <u>Gabriel Ribeiro de Souza</u> e <u>Clara Luna de Bem Barreto Cano</u></p>
+<p><b>Autores:</b> <ins>Gabriel Ribeiro de Souza</ins> e <ins>Clara Luna de Bem Barreto Cano</ins></p>
