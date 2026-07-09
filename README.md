@@ -109,6 +109,7 @@ Para enunciá-las, apresentaremos por presença na aplicação, entre elas:</h3>
     <ul>
       <li>WampServer64</li>
       <li>MySQLWorkbench</li>
+      <li>PHPMyAdmin</li>
     </ul>
   </li>
 </ul>
