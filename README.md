@@ -139,5 +139,5 @@ Durante sua montagem foram encontradas algumas dificuldades, como:</h4>
 
 <h4>Agradecemos a todos que leram até aqui pela sua atenção e curiosidade sobre o sistema, e um até logo!!</h4>
 
-<p><b>Vídeo de Apresentação:</b> <a href="">neste link</a></p>
+<p><b>Vídeo de Apresentação:</b> <a href="https://youtu.be/go6wOqkZDMU">neste link</a></p>
 <p><b>Autores:</b> <ins>Gabriel Ribeiro de Souza</ins> e <ins>Clara Luna de Bem Barreto Cano</ins></p>
