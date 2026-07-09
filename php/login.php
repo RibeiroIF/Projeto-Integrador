@@ -68,11 +68,11 @@
                 </div>
                 <div class="input-group">
                     <label>Crie uma Senha</label>
-                    <input type="password" name="senha" placeholder="Mínimo 6 caracteres" required>
+                    <input type="password" name="senha" minlength="6" placeholder="Mínimo 6 caracteres" required>
                 </div>
                 <div class="input-group">
                     <label>Confirme a Senha</label>
-                    <input type="password" name="senha2" placeholder="Repita a senha" required>
+                    <input type="password" name="senha2" minlength="6" placeholder="Repita a senha" required>
                 </div>
                 <button type="submit" class="btn-login" name="cadastrar">Finalizar Cadastro</button>
             </form>
@@ -85,7 +85,7 @@
     require "../includes/criar-classe-aluno.php";
     require "../includes/criar-classe-admin.php";
 
-    $banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
+    $banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
     $conexao = $banco->criarConexao();
     $banco->criarBanco($conexao);
     $banco->abrirBanco($conexao);
@@ -120,7 +120,6 @@
     if(isset($_POST['cadastrar'])){
         $alunos->receberDadosForm($conexao);
         $alunos->cadastrar($conexao, $banco->aluno);
-        $alunos->redirecionarPagina("../php/login.php");
     }
 
     $banco->desconectar($conexao);

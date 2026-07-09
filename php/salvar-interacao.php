@@ -8,7 +8,7 @@ if (!isset($_SESSION['id_aluno'])) {
     exit();
 }
 
-$banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
+$banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
 $conexao = $banco->criarConexao();
 $banco->abrirBanco($conexao);
 
@@ -38,6 +38,7 @@ if ($acao === 'avaliar') {
         $vendedor = $busca_vendedor->fetch_assoc();
         $id_vendedor = intval($vendedor['id_aluno'] ?? 0);
         $nova_media_formatada = "N/A";
+        
         if ($id_vendedor > 0) {
             $sql_nova_media = "
                 SELECT AVG(a.nota) as media_real 
@@ -52,10 +53,27 @@ if ($acao === 'avaliar') {
                 $nova_media_formatada = number_format($row_media['media_real'], 1, '.', '');
             }
         }
+
+        $nova_media_perfil = null; 
+        $sql_media_perfil = "
+            SELECT AVG(a.nota) as media_real 
+            FROM {$banco->avaliacao} a
+            INNER JOIN {$banco->anuncio} an ON a.id_anuncio = an.id
+            WHERE an.id_aluno = $id_aluno
+        ";
+        $res_perfil = $conexao->query($sql_media_perfil);
+        if ($res_perfil) {
+            $row_perfil = $res_perfil->fetch_assoc();
+            if ($row_perfil['media_real'] !== null) {
+                $nova_media_perfil = number_format($row_perfil['media_real'], 1, '.', '');
+            }
+        }
+
         echo json_encode([
             'status' => 'sucesso', 
             'mensagem' => $msg,
-            'nova_media' => $nova_media_formatada
+            'nova_media' => $nova_media_formatada,
+            'nova_media_perfil' => $nova_media_perfil
         ]);
         exit();
 

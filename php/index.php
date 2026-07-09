@@ -14,7 +14,7 @@ if (!isset($_SESSION['id_aluno'])) {
     header("Location: login.php");
     exit();
 }
-$banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
+$banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
 $conexao = $banco->criarConexao();
 $banco->abrirBanco($conexao);
 $banco->definirCharset($conexao);
@@ -85,15 +85,23 @@ if (isset($_POST['enviar-feedback-sistema'])) {
 }
 
 $id_usuario_logado = intval($_SESSION['id_aluno']);
+
 $sql_media = "
-    SELECT AVG(a.nota) as media_real 
-    FROM " . $banco->avaliacao . " a
-    INNER JOIN " . $banco->anuncio . " an ON a.id_anuncio = an.id
+    SELECT AVG(av.nota) as media_real 
+    FROM " . $banco->avaliacao . " av
+    INNER JOIN " . $banco->anuncio . " an ON av.id_anuncio = an.id
     WHERE an.id_aluno = $id_usuario_logado
 ";
+
 $resultado_media = $conexao->query($sql_media);
-$dados_media = $resultado_media->fetch_assoc();
-$media_formatada = ($dados_media['media_real'] !== null) ? number_format($dados_media['media_real'], 1, '.', '') : "N/A";
+
+if ($resultado_media) {
+    $dados_media = $resultado_media->fetch_assoc();
+    $media_formatada = ($dados_media['media_real'] !== null) ? number_format($dados_media['media_real'], 1, '.', '') : "N/A";
+} else {
+    // Caso dê algum erro de sintaxe ou tabela na query
+    $media_formatada = "N/A";
+}
 ?>
 
 <!--PARTE DE HTML-->
@@ -213,7 +221,7 @@ $media_formatada = ($dados_media['media_real'] !== null) ? number_format($dados_
                 <a href="index.php?busca=Livros" class="btn filter-btn">Livros</a>
                 <a href="index.php?busca=Eletrônicos" class="btn filter-btn">Eletrônicos</a>
                 <a href="index.php?busca=Móveis" class="btn filter-btn">Móveis</a>
-                <a href="index.php?busca=Serviços" class="btn filter-btn">Serviços</a>
+                <a href="index.php?busca=Outros" class="btn filter-btn">Outros</a>
                 <a href="index.php" class="btn filter-btn btn-limpar-filtro-home">Limpar Filtro</a>
             </section>
             <div class="grid-anuncios">
@@ -330,7 +338,7 @@ $media_formatada = ($dados_media['media_real'] !== null) ? number_format($dados_
                     <h3>Informações Básicas</h3>
                     <div class="campo">
                         <label for="titulo">Título do Anúncio *</label>
-                        <input type="text" id="titulo" name="titulo-anuncio" placeholder="Ex: Livro Cálculo A - Diva Flemming" required>
+                        <input type="text" id="titulo" name="titulo-anuncio" placeholder="Ex: Livro Cálculo A - Diva Flemming" maxlength="80" required>
                     </div>
                     <div class="fila-campos">
                         <div class="campo">
@@ -352,7 +360,7 @@ $media_formatada = ($dados_media['media_real'] !== null) ? number_format($dados_
                         </div>
                         <div class="campo">
                             <label for="preco">Preço (R$)*</label>
-                            <input type="number" id="preco" name="preco-anuncio" step="0.01" placeholder="0,00" required>
+                            <input type="number" id="preco" name="preco-anuncio" step="0.01" placeholder="0,00" max="9999" min="0" required>
                         </div>
                     </div>
                 </section>

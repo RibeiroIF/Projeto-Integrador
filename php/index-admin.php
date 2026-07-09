@@ -15,7 +15,7 @@ if (!isset($_SESSION['id_admin'])) {
     exit();
 }
 
-$banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favorito", "avaliacao", "denuncia", "feedback");
+$banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "favorito", "avaliacao", "denuncia", "feedback");
 $conexao = $banco->criarConexao();
 $banco->abrirBanco($conexao);
 $banco->definirCharset($conexao);
@@ -97,19 +97,25 @@ if (isset($_POST['deletar-anuncio-admin'])) {
         <div id="tela-home" class="main tela-home tela show">
             <header class="header-busca">
                 <h2>Explorar Anúncios (Modo Moderador)</h2>
-                <div class="search-bar">
-                    <input type="text" placeholder="Buscar anúncios para moderar...">
-                    <button>Buscar</button>
-                </div>
+                <form action="index-admin.php" method="GET" class="search-bar">
+                    <input type="text" name="busca" placeholder="Buscar anúncios para moderar..." value="<?php echo isset($_GET['busca']) ? htmlspecialchars($_GET['busca'], ENT_QUOTES, 'UTF-8') : ''; ?>">
+                    <button type="submit">Buscar</button>
+                </form>
             </header>
+            
             <section class="filtros-rapidos">
-                <button class="filter-btn">Livros</button>
-                <button class="filter-btn">Eletrônicos</button>
-                <button class="filter-btn">Móveis</button>
-                <button class="filter-btn">Serviços</button>
+                <a href="index-admin.php?busca=Livros" class="btn filter-btn">Livros</a>
+                <a href="index-admin.php?busca=Eletrônicos" class="btn filter-btn">Eletrônicos</a>
+                <a href="index-admin.php?busca=Móveis" class="btn filter-btn">Móveis</a>
+                <a href="index-admin.php?busca=Outros" class="btn filter-btn">Outros</a>
+                <a href="index-admin.php" class="btn filter-btn btn-limpar-filtro-home">Limpar Filtro</a>
             </section>
+            
             <div class="grid-anuncios">
-                <?php $anuncios->listarAnunciosAdmin($conexao, $banco->anuncio); ?>
+                <?php 
+                    $termo = isset($_GET['busca']) ? $_GET['busca'] : '';
+                    $anuncios->listarAnunciosAdmin($conexao, $banco->anuncio, $termo); 
+                ?>
             </div>
         </div>
 
@@ -118,6 +124,7 @@ if (isset($_POST['deletar-anuncio-admin'])) {
                 <h2>Painel de Controle Administrativo</h2>
                 <p>Monitoramento de anúncios e usuários do sistema.</p>
             </header>
+
             <section class="cards-estatisticas">
                 <div class="card-stat">
                     <h3>
@@ -154,7 +161,13 @@ if (isset($_POST['deletar-anuncio-admin'])) {
                 <div class="card-stat card-stat-denuncias">
                     <h3>
                         <?php 
-                        $contDenuncias = $conexao->query("SELECT COUNT(*) FROM `{$banco->denuncia}`");
+                        $sql_cont_denuncias = "
+                            SELECT COUNT(*) 
+                            FROM `{$banco->denuncia}` d
+                            INNER JOIN `{$banco->anuncio}` a ON d.id_anuncio = a.id
+                            WHERE a.deletado = 0 AND a.motivo IS NULL
+                        ";
+                        $contDenuncias = $conexao->query($sql_cont_denuncias);
                         echo $contDenuncias ? $contDenuncias->fetch_row()[0] : "0"; 
                         ?>
                     </h3>
@@ -174,7 +187,14 @@ if (isset($_POST['deletar-anuncio-admin'])) {
                     </thead>
                     <tbody>
                         <?php
-                        $sql_lista_denuncias = "SELECT id_anuncio, comentario FROM `{$banco->denuncia}` ORDER BY id DESC";
+                        $sql_lista_denuncias = "
+                            SELECT d.id_anuncio, d.comentario 
+                            FROM `{$banco->denuncia}` d
+                            INNER JOIN `{$banco->anuncio}` a ON d.id_anuncio = a.id
+                            WHERE a.deletado = 0 AND a.motivo IS NULL
+                            ORDER BY d.id DESC
+                        ";
+                        
                         $resultado_denuncias = $conexao->query($sql_lista_denuncias);
 
                         if ($resultado_denuncias && $resultado_denuncias->num_rows > 0) {

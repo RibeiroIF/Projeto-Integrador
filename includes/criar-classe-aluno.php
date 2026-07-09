@@ -13,25 +13,56 @@
   function receberDadosForm($conexao){
    $this->nome         = trim($conexao->escape_string($_POST["nome"]));
    $this->email        = trim($conexao->escape_string($_POST["email"]));
-   $this->senha      = trim($conexao->escape_string($_POST["senha"]));
-   $this->senha      = password_hash($this->senha, PASSWORD_ARGON2I);
+   $this->senha        = trim($conexao->escape_string($_POST["senha"]));
+   $this->senha2       = isset($_POST["senha2"]) ? trim($conexao->escape_string($_POST["senha2"])) : '';
    
    $this->whatsapp = isset($_POST["whatsapp"]) ? trim($conexao->escape_string($_POST["whatsapp"])) : '';
 
    $this->dataCadastro = date("Y-m-d"); 
    }
 
+  function senhasSaoIguais() {
+      return $this->senha === $this->senha2;
+   }
+
   function cadastrar($conexao, $tabelaAluno){
-   $sql = "INSERT $tabelaAluno VALUES(
+    $emailVerificar = $conexao->real_escape_string($this->email);
+    $sql_verificar = "SELECT id FROM $tabelaAluno WHERE email = '$emailVerificar'";
+    $resultado = $conexao->query($sql_verificar);
+
+    if ($resultado && $resultado->num_rows > 0) {
+        echo "<script>
+                alert('Erro: O e-mail \"{$this->email}\" já está cadastrado!');
+                window.location.href = '../php/login.php';
+              </script>";
+        exit(); 
+    }
+
+    $senhaCriptografada = password_hash($this->senha, PASSWORD_ARGON2I);
+    $sql = "INSERT INTO $tabelaAluno VALUES(
              null,
             '$this->nome',
-            '$this->email',
-            '$this->senha',
+            '$emailVerificar',
+            '$senhaCriptografada',
             '$this->whatsapp',
             '$this->dataCadastro',
             null)";
 
-   $conexao->query($sql) or die($conexao->error);
+    try {
+        $conexao->query($sql);
+        echo "<script>
+                alert('Cadastro realizado com sucesso!');
+                window.location.href = '../php/login.php';
+              </script>";
+        exit();
+    } catch (mysqli_sql_exception $e) {
+        echo "<script>
+                alert('Erro ao cadastrar: Usuário ou e-mail já existente.');
+                window.location.href = '../php/login.php';
+              </script>";
+        exit();
+    }
+
    }
    
    function logar($conexao, $tabelaAluno){

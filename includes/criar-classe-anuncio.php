@@ -160,17 +160,29 @@
     }
 }
 
-function listarAnunciosAdmin($conexao, $anuncio){
+function listarAnunciosAdmin($conexao, $anuncio, $termo = ''){
+    // Escapa o termo para evitar quebras de sintaxe ou SQL Injection
+    $termoEscapado = $conexao->real_escape_string($termo);
+
+    // SQL Base
     $sql = "SELECT a.*, al.whatsapp 
             FROM $anuncio a 
             INNER JOIN aluno al ON a.id_aluno = al.id
-            WHERE a.deletado = 0
-            ORDER BY a.data_publicacao DESC";
+            WHERE a.deletado = 0";
+            
+    // Se um termo foi enviado via GET (barra de pesquisa ou botões), aplica o filtro
+    if (!empty($termoEscapado)) {
+        $sql .= " AND (a.titulo LIKE '%{$termoEscapado}%' 
+                    OR a.descricao LIKE '%{$termoEscapado}%' 
+                    OR a.categoria LIKE '%{$termoEscapado}%')";
+    }
+
+    $sql .= " ORDER BY a.data_publicacao DESC";
             
     $resultado = $conexao->query($sql) or die($conexao->error);
 
     if($resultado->num_rows == 0){ 
-        echo "<p class='aviso-vazio'>Nenhum anúncio disponível no momento.</p>";
+        echo "<p class='aviso-vazio'>Nenhum anúncio correspondente foi encontrado.</p>";
     } else {
         while($vetorRegistro = $resultado->fetch_array()){
             $id        = htmlentities($vetorRegistro[0], ENT_QUOTES, "UTF-8");

@@ -55,10 +55,10 @@
   function criarTabelaAluno($conexao){
     $sql = "CREATE TABLE IF NOT EXISTS $this->aluno(
             id int not null auto_increment,
-            nome varchar(40),
-            email varchar(60),
+            nome varchar(80),
+            email varchar(80) unique,
             senha varchar(128),
-            whatsapp varchar(20),
+            whatsapp varchar(30),
             data_cadastro date,
             foto_perfil VARCHAR(255) DEFAULT NULL,
             constraint pk_aluno primary key(id)
@@ -81,7 +81,7 @@
   function criarTabelaAnuncio($conexao){
     $sql = "CREATE TABLE IF NOT EXISTS $this->anuncio (
            id int not null auto_increment,
-           titulo varchar(30),
+           titulo varchar(80),
            categoria enum ('LIVROS', 'ELETRÔNICOS', 'MÓVEIS', 'OUTROS') default 'ELETRÔNICOS',
            preco decimal(10,2) not null,
            imagem varchar(255) not null,

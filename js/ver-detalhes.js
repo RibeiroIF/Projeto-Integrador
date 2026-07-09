@@ -154,11 +154,9 @@ function enviarAvaliacao(nota) {
         if(res.status === 'sucesso') {
             verDetalhes(idAnuncioAtivo); 
             
-            if (res.nova_media) {
-                const elementoMediaPerfil = document.querySelector('.media-perfil-aside');
-                if (elementoMediaPerfil) {
-                    elementoMediaPerfil.innerText = res.nova_media;
-                }
+            const elementoMediaPerfil = document.querySelector('.media-perfil-aside');
+            if (elementoMediaPerfil && res.hasOwnProperty('nova_media_perfil')) {
+                elementoMediaPerfil.innerText = res.nova_media_perfil ? res.nova_media_perfil : "N/A";
             }
         } else {
             alert(res.mensagem);

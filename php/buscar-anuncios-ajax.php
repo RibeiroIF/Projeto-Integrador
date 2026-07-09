@@ -10,7 +10,7 @@ if (!isset($_SESSION['id_aluno'])) {
 require_once "../includes/criar-banco-classificados.php";
 require_once "../includes/criar-classe-anuncio.php";
 
-$banco = new BancoDeDados("localhost", "root", "dadosmain", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
+$banco = new BancoDeDados("localhost", "root", "", "db_integrador", "admin", "aluno", "anuncio", "favoritos", "avaliacao", "denuncia", "feedback");
 $conexao = $banco->criarConexao();
 $banco->abrirBanco($conexao);
 $banco->definirCharset($conexao);

@@ -39,8 +39,6 @@ formCadastro.addEventListener('submit', function(event) {
         camposSenha[0].value = "";
         camposSenha[1].value = "";
         camposSenha[0].focus();
-    } else {
-        alert("Cadastro realizado com sucesso!");
     }
 });
 
